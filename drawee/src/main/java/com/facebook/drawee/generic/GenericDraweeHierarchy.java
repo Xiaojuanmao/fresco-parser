@@ -39,6 +39,11 @@ import static com.facebook.drawee.drawable.ScalingUtils.ScaleType;
  * Each image can be displayed with a different scale type (or no scaling at all).
  * Fading between the layers is supported. Rounding is supported.
  *
+ * 一个可设置在需要加载的图片出现之前的展位图的hierarchy
+ * 如果提供了啥failure image、retry image、progressbar等等东西都会显示上去
+ * 常用的SimpleDraweeView显示多个drawable，主要逻辑就在这个类里面
+ * 也支持消失动画以及圆角
+ *
  * <p>
  * Example hierarchy with a placeholder, retry, failure and the actual image:
  *  <pre>

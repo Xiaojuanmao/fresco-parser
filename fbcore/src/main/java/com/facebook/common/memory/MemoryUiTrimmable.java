@@ -11,12 +11,20 @@ package com.facebook.common.memory;
 
 /**
  * Intended for UI elements to backup and restore elements from memory on the UI thread
+ *
  */
 public interface MemoryUiTrimmable  {
 
-  /** Trim memory that isn't needed */
+  /**
+   *  Trim memory that isn't needed
+   *  整理不需要的内存？
+   *  什么鬼啊，对UI元素进行备份和恢复
+   *
+   */
   void trim();
 
-  /** Restore memory that was trimmed. */
+  /** Restore memory that was trimmed.
+   * 撤销整理过的内存
+   */
   void untrim();
 }

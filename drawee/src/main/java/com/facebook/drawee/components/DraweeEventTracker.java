@@ -16,9 +16,15 @@ import java.util.concurrent.ArrayBlockingQueue;
  * This class keeps a record of internal events that take place in the Drawee.
  * <p/> Having a record of a last few events is useful for debugging purposes. If you want to
  * disable it, call {@link DraweeEventTracker.disable()} before {@link Fresco.initialize()}.
+ *
+ * 此类用来记录发生在Drawee内部的一些特殊事件
+ * 类似于追踪日志一样的东西，用来更好的帮助debug
+ *
+ * 在fresco初始化之前通过设置能够停用
  */
 public class DraweeEventTracker {
 
+  // 一个阻塞队列来存放Event事件,
   private final Queue<Event> mEventQueue = new ArrayBlockingQueue<>(MAX_EVENTS_TO_TRACK);
 
   private static final int MAX_EVENTS_TO_TRACK = 20;

@@ -10,6 +10,7 @@ package com.facebook.drawee.view;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -61,16 +62,21 @@ public class DraweeHolder<DH extends DraweeHierarchy>
   private boolean mIsVisible = true;
   private boolean mTrimmed = false;
 
-
+  // holder管理的俩实例，hierarchy主要用来管理drawable层级，controller主要用来
   private DH mHierarchy;
-
   private DraweeController mController = null;
 
+  /**
+   * 用来统计drawee使用过程中特殊事件的日志工具
+   * 特殊事件包括设置hierarchy等等
+   */
   private final DraweeEventTracker mEventTracker = DraweeEventTracker.newInstance();
 
   /**
    * Creates a new instance of DraweeHolder that detaches / attaches controller whenever context
    * notifies it about activity's onStop and onStart callbacks.
+   *
+   * 暂时不太清楚为啥要把context传进来，说是为了在onStart和onStop的时候回调。没懂
    *
    * <p>It is recommended to pass a {@link ListenableActivity} as context. This will help in a future release.
    */
@@ -79,7 +85,10 @@ public class DraweeHolder<DH extends DraweeHierarchy>
       Context context) {
     DraweeHolder<DH> holder = new DraweeHolder<DH>(hierarchy);
     holder.registerWithContext(context);
+
+    // 并没有看到有什么用，只是在test上面测试了一波
     MemoryUiTrimmableRegistry.registerUiTrimmable(holder);
+
     return holder;
   }
 
@@ -100,8 +109,13 @@ public class DraweeHolder<DH extends DraweeHierarchy>
   /**
    * Gets the controller ready to display the image.
    *
+   * 在View检测到attach到屏幕之后会调用此方法
+   * 记录日志、设置attached变量以及通知DraweeController关于attach的事件
+   *
    * <p>The containing view must call this method from both {@link View#onFinishTemporaryDetach()}
    * and {@link View#onAttachedToWindow()}.
+   *
+   *
    */
   public void onAttach() {
     mEventTracker.recordEvent(Event.ON_HOLDER_ATTACH);
@@ -161,6 +175,14 @@ public class DraweeHolder<DH extends DraweeHierarchy>
 
   /**
    * Callback used to notify about top-level-drawable's visibility changes.
+   *
+   * 根据hierarchy里面top-level的drawable是否可见来改变属性
+   * 在{@link com.facebook.drawee.generic.RootDrawable}里面有调用到,在top-level-drawable可见属性有变动的情况下就会调用
+   *
+   *
+   * 基本上有情况变动都会调用attachOrDetachController()这个方法
+   * 包括上面的trim()以及untrim()
+   *
    */
   @Override
   public void onVisibilityChange(boolean isVisible) {
@@ -174,6 +196,10 @@ public class DraweeHolder<DH extends DraweeHierarchy>
 
   /**
    * Callback used to notify about top-level-drawable being drawn.
+   *
+   * 用来提示holder，top-level-drawable正在被draw到屏幕上
+   * 在{@link com.facebook.drawee.generic.RootDrawable}里面有调用到,在drawable正在被draw的时候回调
+   *
    */
   @Override
   public void onDraw() {
@@ -282,6 +308,11 @@ public class DraweeHolder<DH extends DraweeHierarchy>
     return mEventTracker;
   }
 
+  /**
+   * 通知controller进行attach的相关工作
+   * 可能是开始加载图片等等工作，看具体实现的情况
+   *
+   */
   private void attachController() {
     if (mIsControllerAttached) {
       return;
@@ -294,6 +325,11 @@ public class DraweeHolder<DH extends DraweeHierarchy>
     }
   }
 
+  /**
+   * 通知controller进行detach工作
+   * 撤销发出去的请求等等
+   *
+   */
   private void detachController() {
     if (!mIsControllerAttached) {
       return;
@@ -305,6 +341,12 @@ public class DraweeHolder<DH extends DraweeHierarchy>
     }
   }
 
+  /**
+   * 根据各种条件以及变量来判断是应该attach还是detach
+   * 根据打的log来看，该方法在detach以及attach的时候，还有在图片加载过程中会被多次的调用
+   * 在设置hierarchy的时候会给drawable设置callback，drawable发生变动也会影响controller的行为
+   *
+   */
   private void attachOrDetachController() {
     if (mIsHolderAttached && mIsVisible && !mTrimmed) {
       attachController();
