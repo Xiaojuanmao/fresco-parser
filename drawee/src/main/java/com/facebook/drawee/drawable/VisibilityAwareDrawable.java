@@ -11,6 +11,7 @@ package com.facebook.drawee.drawable;
 
 /**
  * Interface that enables setting a visibility callback.
+ * 用来通知drawable可见性变化的定义接口
  */
 public interface VisibilityAwareDrawable {
 

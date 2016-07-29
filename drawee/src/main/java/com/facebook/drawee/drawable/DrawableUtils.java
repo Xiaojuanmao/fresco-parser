@@ -16,6 +16,9 @@ import android.graphics.drawable.Drawable;
 
 /**
  * Helper class containing functionality commonly used by drawables.
+ *
+ * 封装了一些drawable能用上的静态函数，函数包括一些clone、copy内部属性、设置回调、处理颜色等等
+ *
  */
 public class DrawableUtils {
 

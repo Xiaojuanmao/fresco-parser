@@ -46,6 +46,9 @@ import static com.facebook.drawee.drawable.ScalingUtils.ScaleType;
  *
  * <p>
  * Example hierarchy with a placeholder, retry, failure and the actual image:
+ *
+ * 下面是一个设置了各种占位图的hierarchy里面，drawable的层级树
+ *
  *  <pre>
  *  o RootDrawable (top level drawable)
  *  |
@@ -70,40 +73,79 @@ import static com.facebook.drawee.drawable.ScalingUtils.ScaleType;
  *        +--o Drawable (failure image)
  *  </pre>
  *
+ *
  * <p>
  * Note:
  * <ul>
  * <li> RootDrawable and FadeDrawable are always created.
+ *
+ * RootDrawable和FadeDrawable这两个drawable总是会被创建
+ *
  * <li> All branches except the actual image branch are optional (placeholder, failure, retry,
  * progress bar). If some branch is not specified it won't be created. Index in FadeDrawable will
  * still be reserved though.
+ *
+ * 除了actual image分支外，所有的drawable层级分支都是可选的，配置则有，不配则无
+ *
  * <li> If overlays and/or background are specified, they are added to the same fade drawable, and
  * are always being displayed.
+ *
+ * 如果Overlays不懂 = = 或者设置了background，则会被加到fade drawable层级上，会一直被显示出来
+ *
  * <li> ScaleType and Matrix transformations will be added only if specified. If both are
  * unspecified, then the branch for that image is attached to FadeDrawable directly. Matrix
  * transformation is only supported for the actual image, and it is not recommended to be used.
+ *
  * <li> Rounding, if specified, is applied to all layers. Rounded drawable can either wrap
  * FadeDrawable, or if leaf rounding is specified, each leaf drawable will be rounded separately.
+ *
+ * 圆角会对所有层面的drawable生效
+ *
  * <li> A particular drawable instance should be used by only one DH. If more than one DH is being
  * built with the same builder, different drawable instances must be specified for each DH.
+ *
+ * 每个传入的drawable应该唯一属于一个DraweeHolder
+ *
  * </ul>
  */
 public class GenericDraweeHierarchy implements SettableDraweeHierarchy {
 
+  // 背景drawable index
   private static final int BACKGROUND_IMAGE_INDEX = 0;
+
+  // 占位图drawable index
   private static final int PLACEHOLDER_IMAGE_INDEX = 1;
+
+  // 真实显示图片的drawable index
   private static final int ACTUAL_IMAGE_INDEX = 2;
+
+  // 进度条 index
   private static final int PROGRESS_BAR_IMAGE_INDEX = 3;
+
+  // 重试drawable index
   private static final int RETRY_IMAGE_INDEX = 4;
+
+  // 失败占位图 index
   private static final int FAILURE_IMAGE_INDEX = 5;
+
+  // Overlay index 不明白是干啥的
   private static final int OVERLAY_IMAGES_INDEX = 6;
 
+  // 一张final 类型的透明drawable, 啥也显示不出来的时候顶上去替位
   private final Drawable mEmptyActualImageDrawable = new ColorDrawable(Color.TRANSPARENT);
 
   private final Resources mResources;
+
+  // 关于圆角的一些参数
   private @Nullable RoundingParams mRoundingParams;
 
+  /**
+   * 应该要不停刷新这个drawable, 每次需要attach上windows的时候就显示这个mTopLevelDrawable, 这个rootdrawable代表了要显示的drawable
+   *
+   * RootDrawable 里面
+   */
   private final RootDrawable mTopLevelDrawable;
+
   private final FadeDrawable mFadeDrawable;
   private final ForwardingDrawable mActualImageWrapper;
 

@@ -15,6 +15,8 @@ import android.graphics.RectF;
 /**
  * Callback that is used to pass any transformation matrix and the root bounds from a parent
  * drawable to its child.
+ *
+ * 用来传递一些drawable变形的动作，从父drawable传递给子drawable
  */
 public interface TransformCallback {
 

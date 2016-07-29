@@ -15,6 +15,9 @@ import android.graphics.drawable.Drawable;
 /**
  * Set of properties for drawable. There are no default values and only gets applied if were set
  * explicitly.
+ *
+ * 只有set方法，没有get方法，需要的时候传入drawable，把值赋给drawable
+ * 类里面包含透明度、ColorFilter
  */
 public class DrawableProperties {
 
