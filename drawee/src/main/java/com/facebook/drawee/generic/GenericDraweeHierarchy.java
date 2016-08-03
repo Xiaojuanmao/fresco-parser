@@ -140,13 +140,27 @@ public class GenericDraweeHierarchy implements SettableDraweeHierarchy {
   private @Nullable RoundingParams mRoundingParams;
 
   /**
+   * {@link RootDrawable} - {@link ForwardingDrawable} - {@link Drawable}
+   *
    * 应该要不停刷新这个drawable, 每次需要attach上windows的时候就显示这个mTopLevelDrawable, 这个rootdrawable代表了要显示的drawable
    *
-   * RootDrawable 里面
+   * RootDrawable 里面持有着一个drawable，自己本身也继承自drawable，将drawable的一些方法重写，方法调用的效果给了内部的drawable
+   * 在需要显示到view上的时候，就把mTopLevelDrawable丢出去绘制
+   *
    */
   private final RootDrawable mTopLevelDrawable;
 
+  /**
+   * 又是一条继承了drawable的路线
+   * {@link FadeDrawable} - {@link com.facebook.drawee.drawable.ArrayDrawable} - {@link Drawable}
+   *
+   *
+   */
   private final FadeDrawable mFadeDrawable;
+
+  /**
+   * {@link ForwardingDrawable} - {@link Drawable}
+   */
   private final ForwardingDrawable mActualImageWrapper;
 
   GenericDraweeHierarchy(GenericDraweeHierarchyBuilder builder) {

@@ -130,6 +130,7 @@ public class ForwardingDrawable extends Drawable
 
   /**
    * 下面设置的一些属性在delegate里面一份，在drawableproperties里面一份
+   * 重写了一些drawable方法，再将方法执行的效果给mCurrentDelegate
    *
    * @param alpha
    */
@@ -214,7 +215,11 @@ public class ForwardingDrawable extends Drawable
     return mCurrentDelegate;
   }
 
-  // DrawableParent methods
+  /**
+   * DrawableParent methods
+   *
+   * 实现DrawableParent接口的方法
+   */
 
   @Override
   public Drawable setDrawable(Drawable newDrawable) {
@@ -277,6 +282,9 @@ public class ForwardingDrawable extends Drawable
   /**
    * Gets the transformed bounds of this drawable.
    * Note: bounds are not cropped (otherwise they would likely be the same as drawable's bounds).
+   *
+   * 得到形变之后的边界
+   *
    * @param outBounds rect to fill with bounds
    */
   public void getTransformedBounds(RectF outBounds) {
@@ -292,4 +300,5 @@ public class ForwardingDrawable extends Drawable
   public void setHotspot(float x, float y) {
     mCurrentDelegate.setHotspot(x, y);
   }
+
 }

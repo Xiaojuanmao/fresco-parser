@@ -14,6 +14,7 @@ import java.util.Arrays;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.os.SystemClock;
+import android.support.annotation.NonNull;
 
 import com.facebook.common.internal.Preconditions;
 import com.facebook.common.internal.VisibleForTesting;
@@ -21,14 +22,22 @@ import com.facebook.common.internal.VisibleForTesting;
 /**
  * A drawable that fades to the specific layer.
  *
+ * 这个drawable类会消失到具体显示的drawable层面
+ *
  * <p> Arbitrary number of layers is supported. 5 Different fade methods are supported.
+ *
+ * 支持多层drawable，以及5中不同消失的方法
+ *
  * Once the transition starts we will animate layers in or out based on used fade method.
+ * 一旦过渡变化开始了，将直接对layer进行操作，控制layer的进出切换
+ *
  * fadeInLayer fades in specified layer to full opacity.
  * fadeOutLayer fades out specified layer to zero opacity.
  * fadeOutAllLayers fades out all layers to zero opacity.
  * fadeToLayer fades in specified layer to full opacity, fades out all other layers to zero opacity.
- * fadeUpToLayer fades in all layers up to specified layer to full opacity and
- * fades out all other layers to zero opacity.
+ * fadeUpToLayer fades in all layers up to specified layer to full opacity and fades out all other layers to zero opacity.
+ *
+ *
  *
  */
 public class FadeDrawable extends ArrayDrawable {
@@ -53,11 +62,13 @@ public class FadeDrawable extends ArrayDrawable {
 
   /**
    * Layers.
+   * 一个Drawable数组，能够容纳多层drawable
    */
   private final Drawable[] mLayers;
 
   /**
    * The current state.
+   * 当前Drawable的一些状态
    */
   @VisibleForTesting int mTransitionState;
   @VisibleForTesting int mDurationMs;
@@ -69,6 +80,7 @@ public class FadeDrawable extends ArrayDrawable {
   /**
    * Determines whether to fade-out a layer to zero opacity (false) or to fade-in to
    * the full opacity (true)
+   * 用来标识每一层drawable的状态
    */
   @VisibleForTesting boolean[] mIsLayerOn;
 
@@ -80,6 +92,8 @@ public class FadeDrawable extends ArrayDrawable {
   /**
    * Creates a new fade drawable.
    * The first layer is displayed with full opacity whereas all other layers are invisible.
+   * 传入一个drawable数组，进行初始化工作
+   *
    * @param layers layers to fade between
    */
   public FadeDrawable(Drawable[] layers) {
@@ -103,6 +117,8 @@ public class FadeDrawable extends ArrayDrawable {
 
   /**
    * Begins the batch mode so that it doesn't invalidate self on every operation.
+   *
+   * 用来进入批处理模式，在批处理模式下无法执行{@link FadeDrawable#invalidateSelf()}函数
    */
   public void beginBatchMode() {
     mPreventInvalidateCount++;
@@ -110,6 +126,8 @@ public class FadeDrawable extends ArrayDrawable {
 
   /**
    * Ends the batch mode and invalidates.
+   *
+   * 用来退出批处理模式,每次调用都还需要invalidateSelf一次
    */
   public void endBatchMode() {
     mPreventInvalidateCount--;
@@ -118,6 +136,10 @@ public class FadeDrawable extends ArrayDrawable {
 
   /**
    * Sets the duration of the current transition in milliseconds.
+   *
+   * 设置当前动画的时间间隔
+   * 重置当前过渡的状态
+   *
    */
   public void setTransitionDuration(int durationMs) {
     mDurationMs = durationMs;
@@ -137,6 +159,8 @@ public class FadeDrawable extends ArrayDrawable {
 
   /**
    * Resets internal state to the initial state.
+   *
+   * 重置FadeDrawable的各种属性
    */
   private void resetInternal() {
     mTransitionState = TRANSITION_NONE;
@@ -158,6 +182,10 @@ public class FadeDrawable extends ArrayDrawable {
 
   /**
    * Starts fading in the specified layer.
+   *
+   * 将第index层的layer设置成open的状态
+   *
+   *
    * @param index the index of the layer to fade in.
    */
   public void fadeInLayer(int index) {
@@ -178,6 +206,7 @@ public class FadeDrawable extends ArrayDrawable {
 
   /**
    * Starts fading in all layers.
+   * 将所有的layer全部都open
    */
   public void fadeInAllLayers() {
     mTransitionState = TRANSITION_STARTING;
@@ -196,6 +225,9 @@ public class FadeDrawable extends ArrayDrawable {
 
   /**
    * Starts fading to the specified layer.
+   *
+   * 渐变到指定的index层,应该是只有index层会显示出来
+   *
    * @param index the index of the layer to fade to
    */
   public void fadeToLayer(int index) {
@@ -209,6 +241,9 @@ public class FadeDrawable extends ArrayDrawable {
    * Starts fading up to the specified layer.
    * <p>
    * Layers up to the specified layer inclusive will fade in, other layers will fade out.
+   *
+   * 一直从0显示到index层，之后的layer都不显示
+   *
    * @param index the index of the layer to fade up to.
    */
   public void fadeUpToLayer(int index) {
@@ -231,6 +266,9 @@ public class FadeDrawable extends ArrayDrawable {
 
   /**
    * Updates the current alphas based on the ratio of the elapsed time and duration.
+   *
+   * 计算透明度的变化
+   *
    * @param ratio
    * @return whether the all layers have reached their target opacity
    */
