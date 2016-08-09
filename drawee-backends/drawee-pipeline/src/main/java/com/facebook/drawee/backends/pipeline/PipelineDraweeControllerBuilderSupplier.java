@@ -22,6 +22,17 @@ import com.facebook.imagepipeline.animated.factory.AnimatedFactory;
 
 import java.util.Set;
 
+/**
+ * 在Fresco初始化的时候就创建了此类的一个实例
+ * 实例里面包含了一些final类型的实例
+ * SimpleDraweeView用的DraweeController也是从这里拿出去的builder构造出来的
+ *
+ * 之前在看DraweeHolder、DraweeHierarchy以及各种RootDrawable的时候
+ * 一直都没有看到关于ImagePipeline、DraweeController的影子
+ * 在最初就分割开了 = =，这耦合我服
+ * 简直就是逻辑一边、显示一边
+ *
+ */
 public class PipelineDraweeControllerBuilderSupplier implements
     Supplier<PipelineDraweeControllerBuilder> {
 

@@ -295,6 +295,13 @@ public class FadeDrawable extends ArrayDrawable {
     return done;
   }
 
+  /**
+   * Draw方法中根据当前变化的状态来进行判断
+   * 会调用上面的updateAlphas来改变layer层级的透明度变化
+   * 一层一层的通过透明度的变化来展示不同的layer
+   *
+   * @param canvas
+   */
   @Override
   public void draw(Canvas canvas) {
     boolean done = true;

@@ -19,8 +19,15 @@ import com.facebook.imagepipeline.core.ImagePipelineFactory;
 /**
  * Fresco entry point.
  *
+ * 这里是Fresco的起点，在Application中对Fresco进行初始化
+ * 会把需要用到的图片加载模块ImagePipeline初始化好
+ * 也创建好了对应的DraweeControllerBuilder方便后期定义DraweeController
+ *
+ * 在初始化的时候能提供一个Config来对ImagePipeline的参数进行定制
+ *
  * <p/> You must initialize this class before use. The simplest way is to just do
  * {#code Fresco.initialize(Context)}.
+ *
  */
 public class Fresco {
   private static PipelineDraweeControllerBuilderSupplier sDraweeControllerBuilderSupplier;

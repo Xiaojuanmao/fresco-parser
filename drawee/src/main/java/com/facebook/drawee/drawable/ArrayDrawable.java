@@ -27,7 +27,13 @@ import com.facebook.common.internal.Preconditions;
  * A Drawable that contains an array of other Drawables (layers). These are drawn in array order,
  * so the element with the largest index will be drawn on top.
  *
+ * 这个类中包含了很多层Drawable，这些drawable会按照数组里的顺序被画在canvas上
+ * 最大index的drawable会被画在最顶层
+ *
  * <p>Similar to android's LayerDrawable but it doesn't support adding/removing layers dynamically.
+ *
+ * 和{@link android.graphics.drawable.LayerDrawable}相似，但不支持动态添加或者移除drawable
+ *
  */
 public class ArrayDrawable extends Drawable
     implements Drawable.Callback, TransformCallback, TransformAwareDrawable {

@@ -154,7 +154,6 @@ public class GenericDraweeHierarchy implements SettableDraweeHierarchy {
    * 又是一条继承了drawable的路线
    * {@link FadeDrawable} - {@link com.facebook.drawee.drawable.ArrayDrawable} - {@link Drawable}
    *
-   *
    */
   private final FadeDrawable mFadeDrawable;
 
@@ -164,6 +163,9 @@ public class GenericDraweeHierarchy implements SettableDraweeHierarchy {
   private final ForwardingDrawable mActualImageWrapper;
 
   GenericDraweeHierarchy(GenericDraweeHierarchyBuilder builder) {
+
+    // 通过Builder来构造hierarchy，根据配置的情况来设置各layer的drawable情况
+
     mResources = builder.getResources();
     mRoundingParams = builder.getRoundingParams();
 
@@ -210,18 +212,23 @@ public class GenericDraweeHierarchy implements SettableDraweeHierarchy {
       }
     }
 
-    // fade drawable composed of layers
+    // fade drawable composed of layers, 将layer和FadeDrawable关联起来
     mFadeDrawable = new FadeDrawable(layers);
     mFadeDrawable.setTransitionDuration(builder.getFadeDuration());
 
-    // rounded corners drawable (optional)
+    // rounded corners drawable (optional), 如果设置了圆角，则对整个FadeDrawable起作用
     Drawable maybeRoundedDrawable =
         WrappingUtils.maybeWrapWithRoundedOverlayColor(mFadeDrawable, mRoundingParams);
 
     // top-level drawable
     mTopLevelDrawable = new RootDrawable(maybeRoundedDrawable);
+    /**
+     * 调用这个方法之后，所有共享统一资源文件的drawable状态都会同态
+     * 如果一个drawable已经被标记为mutable，再次调用此方法无效
+     */
     mTopLevelDrawable.mutate();
 
+    // 将所有的layer都重置归位，只open第一层的drawable
     resetFade();
   }
 
