@@ -36,9 +36,16 @@ import java.util.Set;
 public class PipelineDraweeControllerBuilderSupplier implements
     Supplier<PipelineDraweeControllerBuilder> {
 
+  // 初始化时保留applicationcontext的一个引用
   private final Context mContext;
+
+  // 框架介绍里面说是用来处理图片加载的类
   private final ImagePipeline mImagePipeline;
+
+  // 方便创建PipelineDraweController的工具类
   private final PipelineDraweeControllerFactory mPipelineDraweeControllerFactory;
+
+  // 一个监听器的集合，暂时不知道有什么用处
   private final Set<ControllerListener> mBoundControllerListeners;
 
   public PipelineDraweeControllerBuilderSupplier(Context context) {
@@ -73,6 +80,14 @@ public class PipelineDraweeControllerBuilderSupplier implements
     mBoundControllerListeners = boundControllerListeners;
   }
 
+  /**
+   * 在最开始Fresco初始化的时候就保留了一个此类的引用
+   * 传给了SimpleDraweeView等类中
+   * 需要draweecontrollerbuilder地方的时候直接get()方法，就能直接新建一个Builder
+   *
+   *
+   * @return
+   */
   @Override
   public PipelineDraweeControllerBuilder get() {
     return new PipelineDraweeControllerBuilder(

@@ -24,7 +24,12 @@ import com.facebook.imagepipeline.animated.factory.AnimatedDrawableFactory;
 
 /**
  * Default implementation of {@link PipelineDraweeControllerFactory}.
+ *
+ * 默认实现的工厂类，暂存一些需要用到的对象
+ * 只提供了一个newController方法
+ *
  */
+
 public class PipelineDraweeControllerFactory {
 
   private Resources mResources;
