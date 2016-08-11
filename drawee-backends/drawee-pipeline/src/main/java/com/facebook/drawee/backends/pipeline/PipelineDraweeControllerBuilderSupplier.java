@@ -63,8 +63,11 @@ public class PipelineDraweeControllerBuilderSupplier implements
       ImagePipelineFactory imagePipelineFactory,
       Set<ControllerListener> boundControllerListeners) {
     mContext = context;
+
+    // 通过ImagePipeline工厂的单例创建了一个ImagePipeline实例,整个fresco都用这个imagepipeline
     mImagePipeline = imagePipelineFactory.getImagePipeline();
 
+    //
     final AnimatedFactory animatedFactory = imagePipelineFactory.getAnimatedFactory();
     AnimatedDrawableFactory animatedDrawableFactory = null;
     if (animatedFactory != null) {

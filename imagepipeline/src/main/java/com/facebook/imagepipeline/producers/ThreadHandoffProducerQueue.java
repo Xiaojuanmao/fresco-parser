@@ -16,13 +16,22 @@ import java.util.Deque;
 import java.util.concurrent.Executor;
 
 public class ThreadHandoffProducerQueue {
+
+  // 一个标志位，为true的时候进来的runnable都在队列中等待被执行，如果为false,则进来的runnable能够立马得到执行
   private boolean mQueueing = false;
+
+  // 一个双端队列，头尾都支持加入以及移除操作,队列里面存放着runnable对象
   private final Deque<Runnable> mRunnableList;
+
+  // 从外面传入的一个executor, 可能是一个线程池或者啥，专门用来处理队列里面的runnable
   private final Executor mExecutor;
 
   public ThreadHandoffProducerQueue(Executor executor) {
     mExecutor = Preconditions.checkNotNull(executor);
+
+    // ArrayDeque最开始只有16个空位，在后期如果发现空位不够还会自己扩充容量
     mRunnableList = new ArrayDeque<>();
+
   }
 
   public synchronized void addToQueueOrExecute(Runnable runnable) {

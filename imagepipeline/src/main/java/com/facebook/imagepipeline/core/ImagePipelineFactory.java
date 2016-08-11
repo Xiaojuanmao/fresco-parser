@@ -49,17 +49,23 @@ import com.facebook.imagepipeline.producers.ThreadHandoffProducerQueue;
 
 /**
  * Factory class for the image pipeline.
+ * 一个用来生成ImagePipeline对象的工厂类
  *
  * <p>This class constructs the pipeline and its dependencies from other libraries.
  *
  * <p>As the pipeline object can be quite expensive to create, it is strongly
  * recommended that applications create just one instance of this class
  * and of the pipeline.
+ *
+ * ImagePipeline对象的创建会消耗挺多资源的，建议整个app就共用一个imagePipline对象
  */
 @NotThreadSafe
 public class ImagePipelineFactory {
 
+  // 单例
   private static ImagePipelineFactory sInstance = null;
+
+  // 一个双端队列，能够控制进入队列是否排队或者是立刻执行，需要传入executor来具体的执行
   private final ThreadHandoffProducerQueue mThreadHandoffProducerQueue;
 
   /** Gets the instance of {@link ImagePipelineFactory}. */
