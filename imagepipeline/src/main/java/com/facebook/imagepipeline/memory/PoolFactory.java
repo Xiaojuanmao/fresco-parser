@@ -15,6 +15,10 @@ import com.facebook.common.internal.Preconditions;
 
 /**
  * Factory class for pools.
+ * 为pool而生的一个factory
+ * 里面各种池子 = =，为了省点开销
+ * byte数组池、bitmap池等等
+ *
  */
 @NotThreadSafe
 public class PoolFactory {

@@ -13,10 +13,17 @@ import android.graphics.Bitmap;
 import com.facebook.common.references.CloseableReference;
 import com.facebook.imagepipeline.image.EncodedImage;
 
+/**
+ * 这个接口和{@link com.facebook.imagepipeline.bitmaps.PlatformBitmapFactory}的模式很像额
+ * 提供了俩解码的方法
+ */
 public interface PlatformDecoder {
   /**
    * Creates a bitmap from encoded bytes. Supports JPEG but callers should use {@link
    * #decodeJPEGFromEncodedImage} for partial JPEGs.
+   *
+   * JPEG走下面那个方法
+   * 其余的走这个
    *
    * @param encodedImage the reference to the encoded image with the reference to the encoded bytes
    * @param bitmapConfig the {@link android.graphics.Bitmap.Config} used to create the decoded
@@ -31,6 +38,9 @@ public interface PlatformDecoder {
 
   /**
    * Creates a bitmap from encoded JPEG bytes. Supports a partial JPEG image.
+   *
+   * 支持部分JPEG解码并展示
+   *
    *
    * @param encodedImage the reference to the encoded image with the reference to the encoded bytes
    * @param bitmapConfig the {@link android.graphics.Bitmap.Config} used to create the decoded

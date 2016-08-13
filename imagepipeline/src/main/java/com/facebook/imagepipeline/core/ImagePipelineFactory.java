@@ -47,6 +47,8 @@ import com.facebook.imagepipeline.platform.KitKatPurgeableDecoder;
 import com.facebook.imagepipeline.platform.PlatformDecoder;
 import com.facebook.imagepipeline.producers.ThreadHandoffProducerQueue;
 
+import java.util.concurrent.Executors;
+
 /**
  * Factory class for the image pipeline.
  * 一个用来生成ImagePipeline对象的工厂类
@@ -116,12 +118,32 @@ public class ImagePipelineFactory {
 
   private AnimatedFactory mAnimatedFactory;
 
+  /**
+   * 构造方法，通过传入的config来设置工厂产出的ImagePipeline所带的特性
+   * 还从config里面得到了一个executor给一个能够装载runnable的双端队列设置上
+   *
+   * config中的executorsupplier是一个提供了多种get方法的接口，具体实现类在于{@link DefaultExecutorSupplier}
+   * 通过android提供的{@link Executors}创建了一系列的线程池，在需要使用的地方直接get
+   * 根据需要执行任务的不同来get不同属性的线程池,可以说这个executorsupplier是一个线程池的集合
+   *
+   * @param config
+   */
   public ImagePipelineFactory(ImagePipelineConfig config) {
     mConfig = Preconditions.checkNotNull(config);
     mThreadHandoffProducerQueue = new ThreadHandoffProducerQueue(
         config.getExecutorSupplier().forLightweightBackgroundTasks());
   }
 
+  /**
+   * 懒加载一个动画工厂
+   * 传入了一个{@link PlatformBitmapFactory}, 这个类专门用来创建bitmap的实例对象
+   * 上面这个类仅仅提供了两个抽象方法，类下面引申出了三个子类，对于不同版本的android系统有不同的实现方式
+   * 对HoneyComb、gingerbread以及art版本的系统进行了不同的处理
+   *
+   * 还把一个线程池集合executorsupplier传入了
+   *
+   * @return
+   */
   public AnimatedFactory getAnimatedFactory() {
     if (mAnimatedFactory == null) {
       mAnimatedFactory = AnimatedFactoryProvider.getAnimatedFactory(
@@ -256,24 +278,35 @@ public class ImagePipelineFactory {
    * Provide the implementation of the PlatformBitmapFactory for the current platform
    * using the provided PoolFactory
    *
-   * @param poolFactory The PoolFactory
-   * @param platformDecoder The PlatformDecoder
-   * @return The PlatformBitmapFactory implementation
+   * 判断当前android版本，返回不同的实现类
+   *
+   * @param poolFactory The PoolFactory 从mConfig里面拿出的一个池子集合，{@link PoolFactory}里面好多pool,对bitmap的、对byte数组的等等
+   * @param platformDecoder The PlatformDecoder 此接口的实现类有俩方法，支持普通图片解码以及JPEG的部分解码, 对该实现类的构造在{@link ImagePipelineFactory#getPlatformDecoder()}
+   * @return The PlatformBitmapFactory implementation 构造bitmap的具体工厂类
    */
   public static PlatformBitmapFactory buildPlatformBitmapFactory(
       PoolFactory poolFactory,
       PlatformDecoder platformDecoder) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      // 5.0以上，使用bitmap池
       return new ArtBitmapFactory(poolFactory.getBitmapPool());
     } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+      // 3.1到2.3 使用byte数组那啥
       return new HoneycombBitmapFactory(
           new EmptyJpegGenerator(poolFactory.getPooledByteBufferFactory()),
           platformDecoder);
     } else {
+      // 2.3以下直接交给android处理,貌似直接给native处理了
       return new GingerbreadBitmapFactory();
     }
   }
 
+  /**
+   * 在这里创建具体的bitmap工厂类
+   * 具体的过程交给了楼上的那个方法
+   *
+   * @return
+   */
   public PlatformBitmapFactory getPlatformBitmapFactory() {
     if (mPlatformBitmapFactory == null) {
       mPlatformBitmapFactory = buildPlatformBitmapFactory(
@@ -286,6 +319,8 @@ public class ImagePipelineFactory {
   /**
    * Provide the implementation of the PlatformDecoder for the current platform using the
    * provided PoolFactory
+   * 和创建bitmap的实现类一样
+   * 对不同版本的系统也有不同的分类实现
    *
    * @param poolFactory The PoolFactory
    * @return The PlatformDecoder implementation
@@ -309,6 +344,12 @@ public class ImagePipelineFactory {
     }
   }
 
+  /**
+   * 创建一个专门用来decode的实现类实例
+   * 具体build过程在楼上
+   *
+   * @return
+   */
   public PlatformDecoder getPlatformDecoder() {
     if (mPlatformDecoder == null) {
       mPlatformDecoder = buildPlatformDecoder(

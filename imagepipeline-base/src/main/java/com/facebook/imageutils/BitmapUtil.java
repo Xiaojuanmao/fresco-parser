@@ -26,6 +26,8 @@ import javax.annotation.Nullable;
 
 /**
  * This class contains utility method for Bitmap
+ * 关于bitmap的一些工具类
+ * 例如计算一个bitmap占用的字节数量等方法
  */
 public final class BitmapUtil {
   private static final int DECODE_BUFFER_SIZE = 16 * 1024;

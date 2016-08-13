@@ -56,7 +56,8 @@ import javax.annotation.Nullable;
  * </code>
  *
  * 这个类里面的配置直接影响到ImagePipeline的各种表现形式
- * 包括了
+ * 涉及的一些图片缓存、网络请求等等 = =好多啊啊啊啊啊
+ *
  *
  * <p>This should only be done once per process.
  */

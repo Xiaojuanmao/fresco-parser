@@ -33,6 +33,8 @@ import java.nio.ByteBuffer;
 
 /**
  * Bitmap factory for ART VM (Lollipop and up).
+ * 在萝莉炮之上的android系统上创建bitmap的具体实现
+ *
  */
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 @ThreadSafe
@@ -46,6 +48,10 @@ public class ArtBitmapFactory extends PlatformBitmapFactory {
 
   /**
    * Creates a bitmap of the specified width and height.
+   *
+   * 和android创建bitmap基本无关
+   * 使用BitmapUtil量取需要创建的bitmap大小，从bitmappool中直接取出一张bitmap
+   *
    * @param width the width of the bitmap
    * @param height the height of the bitmap
    * @param bitmapConfig the {@link android.graphics.Bitmap.Config}
@@ -60,6 +66,8 @@ public class ArtBitmapFactory extends PlatformBitmapFactory {
       Bitmap.Config bitmapConfig) {
     int sizeInBytes = BitmapUtil.getSizeInByteForBitmap(width, height, bitmapConfig);
     Bitmap bitmap = mBitmapPool.get(sizeInBytes);
+
+    //
     Bitmaps.reconfigureBitmap(bitmap, width, height, bitmapConfig);
     return CloseableReference.of(bitmap, mBitmapPool);
   }
