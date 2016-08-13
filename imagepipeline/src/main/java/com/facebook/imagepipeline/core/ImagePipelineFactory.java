@@ -73,7 +73,11 @@ public class ImagePipelineFactory {
     return Preconditions.checkNotNull(sInstance, "ImagePipelineFactory was not initialized!");
   }
 
-  /** Initializes {@link ImagePipelineFactory} with default config. */
+  /**
+   * Initializes {@link ImagePipelineFactory} with default config.
+   *
+   * 用默认的一些config来初始化ImagePipelineFactory
+   */
   public static void initialize(Context context) {
     initialize(ImagePipelineConfig.newBuilder(context).build());
   }
