@@ -17,6 +17,7 @@ import com.android.internal.util.Predicate;
 
 /**
  * Interface for the image pipeline memory cache.
+ * 为image pipeline 定义的内存缓存管理接口
  *
  * @param <K> the key type
  * @param <V> the value type

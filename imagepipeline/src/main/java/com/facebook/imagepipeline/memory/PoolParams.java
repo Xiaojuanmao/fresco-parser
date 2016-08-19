@@ -17,6 +17,10 @@ import com.facebook.common.internal.Preconditions;
 
 /**
  * Config parameters for pools ({@link BasePool}. Supplied via a provider.
+ *
+ * 这个类类似于config之类的，存放着一些对BasePool的一些配置的参数
+ * 最大或者最小的容量等等
+ *
  * <p>
  * {@link #maxSizeSoftCap}
  * This represents a soft cap on the size of the pool. When the pool size hits this limit, the pool

@@ -21,6 +21,7 @@ import com.facebook.imagepipeline.nativecode.ImagePipelineNativeLoader;
 
 /**
  * Wrapper around chunk of native memory.
+ * 此类用来包装native内存块
  *
  * <p> This class uses JNI to obtain pointer to native memory and read/write data from/to it.
  *

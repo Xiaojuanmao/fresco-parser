@@ -21,10 +21,17 @@ import com.facebook.common.internal.VisibleForTesting;
 /**
  * The Bucket is a constituent class of {@link BasePool}. The pool maintains its free values
  * in a set of buckets, where each bucket represents a set of values of the same 'size'.
+ *
+ * 此类用来组成BasePool, pool用一个bucket的集合来表示当前空闲的容量
+ * 每个桶的大小都是一样的
+ *
  * <p>
  * Each bucket maintains a freelist of values.
  * When the pool receives a {@link BasePool#get(Object)} request for a particular size, it finds the
  * appropriate bucket, and delegates the request to the bucket ({@link #get()}.
+ *
+ * pool收到get方法调用之后会在buckets里面寻找合适大小，并将方法代理给bucket
+ *
  * If the bucket's freelist is  non-empty, then one of the entries on the freelist is returned (and
  * removed from the freelist).
  * Similarly, when a value is released to the pool via a call to {@link BasePool#release(Object)},
@@ -39,14 +46,20 @@ import com.facebook.common.internal.VisibleForTesting;
  * that this bucket should grow to - and is used by the pool to determine whether values should
  * be released to the bucket ot freed.
  * @param <V> type of values to be 'stored' in the bucket
+ *
  */
 @NotThreadSafe
 @VisibleForTesting
 class Bucket<V> {
+  // 桶里所有item总字节数加起来的大小
   public final int mItemSize; // size in bytes of items in this bucket
+
+  // 总大小
   public final int mMaxLength; // 'max' length for this bucket
+
   final Queue mFreeList; // the free list for this bucket, subclasses can vary type
 
+  // 正在投入使用中的大小
   private int mInUseLength; // current number of entries 'in use' (i.e.) not in the free list
 
   /**
@@ -69,6 +82,8 @@ class Bucket<V> {
   /**
    * Determines if the current length of the bucket (free + used) exceeds the max length
    * specified
+   *
+   * 用来检查是否超过了最大容量
    */
   public boolean isMaxLengthExceeded() {
     return (mInUseLength + getFreeListSize() > mMaxLength);
@@ -106,6 +121,8 @@ class Bucket<V> {
    * Increment the mInUseCount field.
    * Used by the pool to update the bucket info when a value was 'alloc'ed (because no free value
    * was available)
+   * 这个方法是供pool调用的，当bucket里面没有剩余空间的时候，再申请出来其余空间就需要记录
+   *
    */
   public void incrementInUseCount() {
     mInUseLength++;
@@ -113,6 +130,7 @@ class Bucket<V> {
 
   /**
    * Releases a value to this bucket and decrements the inUse count
+   * 将一个对象的空间释放给bucket
    * @param value the value to release
    */
   public void release(V value) {

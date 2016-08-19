@@ -23,10 +23,16 @@ import com.facebook.common.internal.Preconditions;
 @NotThreadSafe
 public class PoolFactory {
 
+  // pool的参数
   private final PoolConfig mConfig;
 
+  // 用来管理bitmap的一个池，继承自BasePool
   private BitmapPool mBitmapPool;
+
+  // byte数组的一个池
   private FlexByteArrayPool mFlexByteArrayPool;
+
+  // 管理native内存块的池
   private NativeMemoryChunkPool mNativeMemoryChunkPool;
   private PooledByteBufferFactory mPooledByteBufferFactory;
   private PooledByteStreams mPooledByteStreams;

@@ -35,13 +35,24 @@ import com.facebook.common.memory.MemoryTrimmableRegistry;
  * The pool is organized as a map. Each entry in the map is a free-list (modeled by a queue) of
  * entries for a given size.
  * Some pools have a fixed set of buckets (aka bucketized sizes), while others don't.
+ *
+ * BasePool是一个管理着传入的范式类型的一种池子
+ *
+ *
  * <p>
  * The pool supports two main operations:
  * <ul>
  *   <li> {@link #get(int)} - returns a value of size that's the same or larger than specified, hopefully
  *   from the pool; otherwise, this value is allocated (via the alloc function)</li>
+ *
+ *   get操作直接从池子里面取出符合要求的对象
+ *
  *   <li> {@link #release(V)} - releases a value to the pool</li>
+ *
+ *   release将对象回收到池里
+ *
  * </ul>
+ *
  * In addition, the pool subscribes to the {@link MemoryTrimmableRegistry}, and responds to
  * low-memory events (calls to trim). Some percent (perhaps all) of the values in the pool are then
  * released (via the underlying free function), and no longer belong to the pool.
@@ -116,33 +127,54 @@ public abstract class BasePool<V> implements Pool<V> {
 
   /**
    * The memory manager to register with
+   *
+   * 用来管理trimmable类的一个辅助类
    */
   final MemoryTrimmableRegistry mMemoryTrimmableRegistry;
 
   /**
    * Provider for pool parameters
+   *
+   * 一个容器类，存放着关于pool的大小配置
    */
   final PoolParams mPoolParams;
 
   /**
    * The buckets - representing different 'sizes'
+   *
+   * {@link SparseArray}此类的实例是一个对象数组，里面用int数组和Object数组互相映射
+   * 官方解释是效率比HashMap<Integer, Object>的要高，不用自动拆箱和装箱
+   *
+   * 数据量不大，最好在千级以内
+   * 在key必须为int类型的情况下，HashMap可以用SparseArray代替
+   *
+   * 这个可以理解为pool里面放着很多个bucket，每个bucket里面有存放着很多大小相同的V实例
+   *
+   * {@link Bucket} 这个类具体管理着一些实例对象的获取或者释放
+   *
    */
   @VisibleForTesting
   final SparseArray<Bucket<V>> mBuckets;
 
   /**
    * An Identity hash-set to keep track of values by reference equality
+   *
+   * 将正在被使用的对象引用保留在一个集合里
+   *
    */
   @VisibleForTesting
   final Set<V> mInUseValues;
 
   /**
    * Determines if new buckets can be created
+   * 用来控制是否能够新创建bucket
    */
   private boolean mAllowNewBuckets;
 
   /**
    * tracks 'used space' - space allocated via the pool
+   *
+   * 一个计数器？用来统计投入使用的对象数量以及占用的字节数量
    */
   @VisibleForTesting
   @GuardedBy("this")
@@ -150,11 +182,18 @@ public abstract class BasePool<V> implements Pool<V> {
 
   /**
    * tracks 'free space' in the pool
+   *
+   * 和上面一样的一个统计类，用来统计空闲的对象数量以及占用的字节数
    */
   @VisibleForTesting
   @GuardedBy("this")
   final Counter mFree;
 
+  /**
+   * 用来对pool的一些特殊状态进行监控
+   * 例如达到了池的hard或者soft容量的界限
+   *
+   */
   private final PoolStatsTracker mPoolStatsTracker;
 
   /**
@@ -182,6 +221,8 @@ public abstract class BasePool<V> implements Pool<V> {
 
   /**
    * Finish pool initialization.
+   *
+   * 在pool初始化完成之后调用
    */
   protected void initialize() {
     mMemoryTrimmableRegistry.registerMemoryTrimmable(this);
@@ -190,19 +231,32 @@ public abstract class BasePool<V> implements Pool<V> {
 
   /**
    * Gets a new 'value' from the pool, if available. Allocates a new value if necessary.
+   *
+   * 如果池子里面还有空闲空间，则通过get方法直接获取
+   * 在必要的时候只能采取申请新的空间，而不是复用池里的空间
+   *
    * If we need to perform an allocation,
+   * 在申请新的空间时，下面的一些情况应考虑
    *   - If the pool size exceeds the max-size soft cap, then we attempt to trim the free portion
    *     of the pool.
+   *     如果池目前的大小已经超过了soft界限，则试图裁剪出更多的空闲空间
+   *
    *   - If the pool size exceeds the max-size hard-cap (after trimming), then we throw an
    *     {@link PoolSizeViolationException}
+   *     如果当前池的大小已经超过了hard的大小，会抛出一个异常
+   *
    * Bucket length constraints are not considered in this function
+   * 这个函数中并没有考虑桶的大小限制
+   *
    * @param size the logical size to allocate
    * @return a new value
    * @throws InvalidSizeException
    */
   public V get(int size) {
+    // 确保pool当前的大小没有超过soft界限或者空闲空间为0
     ensurePoolSizeInvariant();
 
+    // 根据抽象方法获得size对应的bucket的大小，BitmapPool中返回的就是原值，其余的实现会不太一样，有可能会返回一个比size大的bucketedSize
     int bucketedSize = getBucketedSize(size);
     int sizeInBytes = -1;
 
@@ -210,17 +264,29 @@ public abstract class BasePool<V> implements Pool<V> {
       Bucket<V> bucket = getBucket(bucketedSize);
 
       if (bucket != null) {
+        // 当前bucket不为null则开始在bucket中寻找可用空间
         // find an existing value that we can reuse
+        // 从当前bucket中取出一个可用item,bucket内部还是用linkedList管理着
         V value = bucket.get();
         if (value != null) {
+
+          // 当获取到的对象value不为null，则说明拿到了一个可重用对象，做一些统计工作之后就能直接返回,开心的用起来
+
+          // 将当前的value加入到mInUseValues中，表示正在使用中，如果发生重复添加，则会返回false,当前这个value的状态有点混乱= =，直接丢个exception出来
           Preconditions.checkState(mInUseValues.add(value));
 
           // It is possible that we got a 'larger' value than we asked for.
+          // 可能在获取bucketsize的时候拿到一个稍大的，在这里需要做一些后续的调整
           // lets recompute size in bytes here
+          // 返回当前value对象占用的真实占用空间大小
           bucketedSize = getBucketedSizeForValue(value);
           sizeInBytes = getSizeInBytes(bucketedSize);
+
+          // 让俩计数器给记录数值
           mUsed.increment(sizeInBytes);
           mFree.decrement(sizeInBytes);
+
+          // 打出当前pool状态的日志
           mPoolStatsTracker.onValueReuse(sizeInBytes);
           logStats();
           if (FLog.isLoggable(FLog.VERBOSE)) {
@@ -235,8 +301,11 @@ public abstract class BasePool<V> implements Pool<V> {
         // fall through
       }
       // check to see if we can allocate a value of the given size without exceeding the hard cap
+      // 运行到这里的时候，value为null,可能由于pool当前已经触碰到了soft容量边界了
+      // 这时候需要再次检查下如果申请一块内存空间，是否触碰到了hard边界
       sizeInBytes = getSizeInBytes(bucketedSize);
       if (!canAllocate(sizeInBytes)) {
+        // 如果当前不能再申请sizeInBytes这么大的空间了，抛出exception
         throw new PoolSizeViolationException(
             mPoolParams.maxSizeHardCap,
             mUsed.mNumBytes,
@@ -245,6 +314,11 @@ public abstract class BasePool<V> implements Pool<V> {
       }
 
       // Optimistically assume that allocation succeeds - if it fails, we need to undo those changes
+      /**
+       * 先假设申请内存成功了，如果失败后还需要撤销这些操作
+       * 可能是为了防止并发的时候申请的内存激增，如果等到申请完再增加这个mUsed,可能并发过来的那些请求都能够通过
+       * {@link #canAllocate(int)}方法
+       */
       mUsed.increment(sizeInBytes);
       if (bucket != null) {
         bucket.incrementInUseCount();
@@ -256,10 +330,16 @@ public abstract class BasePool<V> implements Pool<V> {
       // allocate the value outside the synchronized block, because it can be pretty expensive
       // we could have done the allocation inside the synchronized block,
       // but that would have blocked out other operations on the pool
+      /**
+       * 尝试新建一个对象，alloc具体实现丢给子类
+       */
       value = alloc(bucketedSize);
     } catch (Throwable e) {
       // Assumption we made previously is not valid - allocation failed. We need to fix internal
       // counters.
+      /**
+       * 如果出问题了撤销上面做的一些工作
+       */
       synchronized (this) {
         mUsed.decrement(sizeInBytes);
         Bucket<V> bucket = getBucket(bucketedSize);
@@ -275,6 +355,12 @@ public abstract class BasePool<V> implements Pool<V> {
     // the result being that we're now over the hard cap.
     // We are willing to live with that situation - especially since the trim call below should
     // be able to trim back memory usage.
+    /**
+     * 进行到这里一步说明pool已经比较满了，都快顶到hard边界了
+     * 要开始裁剪free区域了(trim
+     * 一直裁剪到free区域为空或者低于soft容量之下
+     *
+     */
     synchronized(this) {
       Preconditions.checkState(mInUseValues.add(value));
       // If we're over the pool's max size, try to trim the pool appropriately
@@ -295,16 +381,27 @@ public abstract class BasePool<V> implements Pool<V> {
 
   /**
    * Releases the given value to the pool.
+   *
+   * 将一个对象释放，如果条件允许则将其收纳在pool中
+   *
    * In a few cases, the value is 'freed' instead of being released to the pool. If
    *   - the pool currently exceeds its max size OR
    *   - if the value does not map to a bucket that's currently maintained by the pool, OR
    *   - if the bucket for the value exceeds its maxLength, OR
    *   - if the value is not recognized by the pool
    *  then, the value is 'freed'.
+   *
+   *  当出现下面几种情况，value才会被直接释放而不回收到pool中
+   *  1. pool里面已经满了
+   *  2. 如果当前value的大小并没有对应的bucket
+   *  3. 对应的bucket收纳不下这个value
+   *  4. value并不能被这个Pool识别，走错地方了
+   *
    * @param value the value to release to the pool
    */
   @Override
   public void release(V value) {
+    // 判空
     Preconditions.checkNotNull(value);
 
     final int bucketedSize = getBucketedSizeForValue(value);
@@ -447,6 +544,10 @@ public abstract class BasePool<V> implements Pool<V> {
   /**
    * Initialize the list of buckets. Get the bucket sizes (and bucket lengths) from the bucket
    * sizes provider
+   *
+   * 初始化整个池内bucket
+   *
+   *
    * @param inUseCounts map of current buckets and their in use counts
    */
   private synchronized void initBuckets(SparseIntArray inUseCounts) {
@@ -528,6 +629,7 @@ public abstract class BasePool<V> implements Pool<V> {
   /**
    * Trim the (free portion of the) pool so that the pool size is at or below the soft cap.
    * This will try to free up values in the free portion of the pool, until
+   *
    *   (a) the pool size is now below the soft cap configured OR
    *   (b) the free portion of the pool is empty
    */
@@ -544,11 +646,22 @@ public abstract class BasePool<V> implements Pool<V> {
    * max size; whichever comes first.
    * NOTE: It is NOT an error if we have eliminated all the free values, but the pool is still
    * above its max size (soft cap)
+   *
+   * 手动的从每个bucket中释放V对象
+   * 直到当前的free空间为0或者达到了目标要求才停止
+   *
    * <p>
    * The approach we take is to go from the smallest sized bucket down to the largest sized
    * bucket. This may seem a bit counter-intuitive, but the rationale is that allocating
    * larger-sized values is more expensive than the smaller-sized ones, so we want to keep them
    * around for a while.
+   *
+   * 裁剪的策略是从小的bucket开始往大bucket裁剪
+   * 小的对象被回收了再创建的代价要小于大对象创建所消耗的代价
+   *
+   * 而释放的具体方法也交给了实现类，不同对象的回收方法可能会不同，例如bitmap的回收可能就只能调用recycle
+   * 其余的还需要交给android自己去完成
+   *
    * @param targetSize target size to trim to
    */
   @VisibleForTesting
@@ -600,18 +713,22 @@ public abstract class BasePool<V> implements Pool<V> {
 
   /**
    * Gets the freelist for the specified bucket. Create the freelist if there isn't one
+   * 获得一个大小为bucketedSize的bucket，如果没有找到合适的，则根据具体情况新建一个
+   *
    * @param bucketedSize the bucket size
    * @return the freelist for the bucket
    */
   @VisibleForTesting
   synchronized Bucket<V> getBucket(int bucketedSize) {
     // get an existing bucket
+    // 先尝试去获取一个符合大小的bucket,如果不为空或者为空但不允许新建bucket，则返回当前拿到的buckey
     Bucket<V> bucket = mBuckets.get(bucketedSize);
     if (bucket != null || !mAllowNewBuckets) {
       return bucket;
     }
 
     // create a new bucket
+    // pool允许创建新的bucket,存入pool并返回
     if (FLog.isLoggable(FLog.VERBOSE)) {
       FLog.v(TAG, "creating new bucket %s", bucketedSize);
     }
