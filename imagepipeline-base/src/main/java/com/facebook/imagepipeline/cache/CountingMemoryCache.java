@@ -342,7 +342,11 @@ public class CountingMemoryCache<K, V> implements MemoryCache<K, V>, MemoryTrimm
     return !mCachedEntries.getMatchingEntries(predicate).isEmpty();
   }
 
-  /** Trims the cache according to the specified trimming strategy and the given trim type. */
+  /**
+   *  Trims the cache according to the specified trimming strategy and the given trim type.
+   *
+   *  {@link MemoryTrimmable}接口中的方法，在裁剪内存的时候回调用到
+   */
   @Override
   public void trim(MemoryTrimType trimType) {
     ArrayList<Entry<K, V>> oldEntries;

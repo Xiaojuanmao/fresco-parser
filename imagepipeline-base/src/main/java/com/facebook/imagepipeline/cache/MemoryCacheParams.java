@@ -11,6 +11,8 @@ package com.facebook.imagepipeline.cache;
 
 /**
  * Configuration for a memory cache.
+ *
+ * 一个存放记录cache容量标准的类
  */
 public class MemoryCacheParams {
 

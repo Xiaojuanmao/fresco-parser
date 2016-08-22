@@ -12,6 +12,9 @@ package com.facebook.imagepipeline.producers;
 /**
  * Consumes data produced by {@link Producer}.<T>
  *
+ * 处理由Producer产生的数据
+ * Producer处理得到新的数据或者得到失败信息之后会通知consumer
+ *
  * <p> The producer uses this interface to notify its client when new data is ready or an error
  * occurs. Execution of the image request is structured as a sequence of Producers. Each one
  * consumes data produced by producer preceding it in the sequence.
@@ -41,6 +44,8 @@ public interface Consumer<T> {
    * Consumer needs to make copy of it if the resource must be accessed after that. Fortunately,
    * with CloseableReferences, that should not impose too much overhead.
    *
+   * 当producer产生了新的结果，就应该回调这个方法
+   *
    * @param newResult
    * @param isLast true if newResult is the last result
    */
@@ -49,6 +54,8 @@ public interface Consumer<T> {
   /**
    * Called by a producer whenever it terminates further work due to Throwable being thrown. This
    * method should not throw an exception.
+   *
+   * 当在处理逻辑的时候产生了异常的情况，回调此方法
    *
    * @param t
    */
@@ -61,6 +68,8 @@ public interface Consumer<T> {
 
   /**
    * Called when the progress updates.
+   *
+   * 当任务有进度反馈的时候
    *
    * @param progress in range [0, 1]
    */

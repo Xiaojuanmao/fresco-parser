@@ -20,6 +20,9 @@ import com.facebook.imagepipeline.request.Postprocessor;
 
 /**
  * Default implementation of {@link CacheKeyFactory}.
+ * 唯一实现类
+ * 用来生成cachekey
+ *
  */
 public class DefaultCacheKeyFactory implements CacheKeyFactory {
 

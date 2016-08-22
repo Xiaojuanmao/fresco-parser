@@ -14,6 +14,9 @@ import com.facebook.imagepipeline.request.ImageRequest;
 
 /**
  * Listener for {@link ImageRequest}.
+ *
+ * 用来对ImageRequest监听的回调接口
+ *
  */
 public interface RequestListener extends ProducerListener {
   /**

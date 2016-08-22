@@ -18,6 +18,9 @@ import com.facebook.common.disk.DiskTrimmable;
 
 /**
  * Interface that caches based on disk should implement.
+ *
+ * 为文件缓存定义的一系列接口
+ * 实现了磁盘可裁剪接口
  */
 public interface FileCache extends DiskTrimmable {
 

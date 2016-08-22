@@ -88,7 +88,6 @@ public class PipelineDraweeControllerBuilderSupplier implements
    * 传给了SimpleDraweeView等类中
    * 需要draweecontrollerbuilder地方的时候直接get()方法，就能直接新建一个Builder
    *
-   *
    * @return
    */
   @Override

@@ -20,8 +20,13 @@ import com.facebook.imagepipeline.image.EncodedImage;
 /**
  * Interface that specifies network fetcher used by the image pipeline.
  *
+ * 用来进行网络请求的一些接口
+ *
  * <p>It is strongly recommended that implementations use an {@link Executor} in their
  * {@link #fetch} method to execute the network request on a different thread.
+ *
+ * 强烈建议在调用fetch方法的时候用executor线程池等来执行
+ * 在另外的线程来进行网络请求
  *
  * <p> When the fetch from the network fails or is cancelled, the subclass is responsible for
  * calling {@link Callback} methods. If these are not called, the pipeline will not know that the
@@ -33,6 +38,9 @@ public interface NetworkFetcher<FETCH_STATE extends FetchState> {
 
   /**
    * Callback used to inform the network fetch producer.
+   *
+   * 用来通知producer网络请求的状况
+   *
    */
   interface Callback {
 
@@ -60,6 +68,8 @@ public interface NetworkFetcher<FETCH_STATE extends FetchState> {
   /**
    * Creates a new instance of the {@link FetchState}-derived object used to store state.
    *
+   * 用来创建NetworkFetcher实例的
+   *
    * @param consumer the consumer
    * @param producerContext the producer's context
    * @return a new fetch state instance
@@ -72,6 +82,8 @@ public interface NetworkFetcher<FETCH_STATE extends FetchState> {
    * Initiates the network fetch and informs the producer when a response is received via the
    * provided callback.
    *
+   * 做网络请求，并在有响应的时候提示提示producer
+   *
    * @param fetchState the fetch-specific state
    * @param callback the callback used to inform the network fetch producer
    */
@@ -79,6 +91,8 @@ public interface NetworkFetcher<FETCH_STATE extends FetchState> {
 
   /**
    * Gets whether the intermediate results should be propagated.
+   *
+   * 用来决定中间结果是否需要传递
    *
    * <p>In <i>addition</i> to the requirements of this method, intermediate results are throttled so
    * that a maximum of one every 100 ms is propagated. This is to conserve CPU and other resources.
@@ -92,6 +106,8 @@ public interface NetworkFetcher<FETCH_STATE extends FetchState> {
 
   /**
    * Called after the fetch completes.
+   *
+   * 在网络请求结束之后调用
    *
    * <p> Implementing this method is optional and is useful for instrumentation purposes.
    *

@@ -98,9 +98,9 @@ public class ImagePipelineFactory {
     }
   }
 
-  private final ImagePipelineConfig mConfig;
+  private final ImagePipelineConfig mConfig; //　一个ImagePipeline需要使用的到一些辅助类集合
   private CountingMemoryCache<CacheKey, CloseableImage>
-      mBitmapCountingMemoryCache;
+      mBitmapCountingMemoryCache; //　
   private MemoryCache<CacheKey, CloseableImage> mBitmapMemoryCache;
   private CountingMemoryCache<CacheKey, PooledByteBuffer> mEncodedCountingMemoryCache;
   private MemoryCache<CacheKey, PooledByteBuffer> mEncodedMemoryCache;

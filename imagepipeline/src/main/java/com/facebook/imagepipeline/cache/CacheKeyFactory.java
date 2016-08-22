@@ -16,6 +16,8 @@ import com.facebook.imagepipeline.request.ImageRequest;
 
 /**
  * Factory methods for creating cache keys for the pipeline.
+ *
+ * 用来创建cachekey的接口
  */
 public interface CacheKeyFactory {
 

@@ -26,6 +26,10 @@ public interface Producer<T> {
   /**
    * Start producing results for given context. Provided consumer is notified whenever progress is
    * made (new value is ready or error occurs).
+   *
+   * 根据给定的ProducerContext来进行逻辑工作
+   * 在逻辑执行的过程中会通知consumer一些特殊的事件
+   *
    * @param consumer
    * @param context
    */

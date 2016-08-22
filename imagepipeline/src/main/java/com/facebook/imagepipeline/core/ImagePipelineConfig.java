@@ -69,26 +69,26 @@ public class ImagePipelineConfig {
   // There are a lot of parameters in this class. Please follow strict alphabetical order.
   @Nullable private final AnimatedImageFactory mAnimatedImageFactory;
   private final Bitmap.Config mBitmapConfig;
-  private final Supplier<MemoryCacheParams> mBitmapMemoryCacheParamsSupplier;
-  private final CacheKeyFactory mCacheKeyFactory;
+  private final Supplier<MemoryCacheParams> mBitmapMemoryCacheParamsSupplier; // 用来记录bitmap的缓存容量标杆
+  private final CacheKeyFactory mCacheKeyFactory; // 用来生成cachekey的工厂方法,唯一实现类为DefaultCacheKeyFactory
   private final Context mContext;
   private final boolean mDownsampleEnabled;
   private final boolean mDecodeMemoryFileEnabled;
-  private final FileCacheFactory mFileCacheFactory;
-  private final Supplier<MemoryCacheParams> mEncodedMemoryCacheParamsSupplier;
-  private final ExecutorSupplier mExecutorSupplier;
-  private final ImageCacheStatsTracker mImageCacheStatsTracker;
-  @Nullable private final ImageDecoder mImageDecoder;
+  private final FileCacheFactory mFileCacheFactory; // DiskStorageCacheFactory为唯一实现类，用来根据提供的DiskCacheConfig来返回对应的FileCache,文件cache的管理是由DiskStorageCache这个类里面的逻辑实现的
+  private final Supplier<MemoryCacheParams> mEncodedMemoryCacheParamsSupplier; // 用于记录encoded缓存的一些标杆参数
+  private final ExecutorSupplier mExecutorSupplier; // 用来提供执行线程的线程池集合, 有执行各种不同工作的线程池供使用
+  private final ImageCacheStatsTracker mImageCacheStatsTracker; // 对图片cache容量等状态追踪的类
+  @Nullable private final ImageDecoder mImageDecoder; // 进行图片decode的类
   private final Supplier<Boolean> mIsPrefetchEnabledSupplier;
-  private final DiskCacheConfig mMainDiskCacheConfig;
-  private final MemoryTrimmableRegistry mMemoryTrimmableRegistry;
-  private final NetworkFetcher mNetworkFetcher;
-  @Nullable private final PlatformBitmapFactory mPlatformBitmapFactory;
-  private final PoolFactory mPoolFactory;
-  private final ProgressiveJpegConfig mProgressiveJpegConfig;
-  private final Set<RequestListener> mRequestListeners;
+  private final DiskCacheConfig mMainDiskCacheConfig; // 主要磁盘cache的一些参数
+  private final MemoryTrimmableRegistry mMemoryTrimmableRegistry; // 用来内存容量裁剪的工具
+  private final NetworkFetcher mNetworkFetcher; // 用于网络请求的执行类
+  @Nullable private final PlatformBitmapFactory mPlatformBitmapFactory; // 创建bitmap的接口，对于不同android系统会有不同的实现方式
+  private final PoolFactory mPoolFactory; // 管理着各种缓冲池
+  private final ProgressiveJpegConfig mProgressiveJpegConfig; // 关于渐进式JPEG图片的接口, 默认实现类为SimpleProgressiveJpegConfig
+  private final Set<RequestListener> mRequestListeners; // 对ImageRequest进行监听的接口集合
   private final boolean mResizeAndRotateEnabledForNetwork;
-  private final DiskCacheConfig mSmallImageDiskCacheConfig;
+  private final DiskCacheConfig mSmallImageDiskCacheConfig; // 为DiskStorageCache类准备的参数类
   private final ImagePipelineExperiments mImagePipelineExperiments;
 
   private ImagePipelineConfig(Builder builder) {

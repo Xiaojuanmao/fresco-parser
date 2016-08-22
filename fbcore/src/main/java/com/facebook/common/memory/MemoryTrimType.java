@@ -11,6 +11,8 @@ package com.facebook.common.memory;
 
 /**
  * Types of memory trim.
+ * 内存裁剪的类型
+ * 应该是规定了裁剪的力度
  *
  * <p>Each type of trim will provide a suggested trim ratio.
  *
@@ -18,7 +20,9 @@ package com.facebook.common.memory;
  */
 public enum MemoryTrimType {
 
-  /** The application is approaching the device-specific Java heap limit. */
+  /**
+   * The application is approaching the device-specific Java heap limit.
+   */
   OnCloseToDalvikHeapLimit(0.5),
 
   /** The system as a whole is running out of memory, and this application is in the foreground. */

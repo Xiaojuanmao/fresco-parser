@@ -13,6 +13,7 @@ import com.facebook.imagepipeline.image.QualityInfo;
 
 /**
  * Progressive JPEG config.
+ * 渐进式JPEG的一些
  */
 public interface ProgressiveJpegConfig {
 

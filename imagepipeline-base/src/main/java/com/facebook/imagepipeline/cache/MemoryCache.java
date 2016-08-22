@@ -26,6 +26,7 @@ public interface MemoryCache<K, V> {
 
   /**
    * Caches the the given key-value pair.
+   * 将给出的一个键值对缓存起来
    *
    * <p> The cache returns a new copy of the provided reference which should be used instead of the
    * original one. The client should close the returned reference when it is not required anymore.
@@ -41,6 +42,7 @@ public interface MemoryCache<K, V> {
 
   /**
    * Gets the item with the given key, or null if there is no such item.
+   * 根据提供的key来返回一个value的closeableReference引用
    *
    * @param key
    * @return a reference to the cached value, or null if the item was not found
@@ -51,6 +53,8 @@ public interface MemoryCache<K, V> {
   /**
    * Removes all the items from the cache whose keys match the specified predicate.
    *
+   * 移除所有满足predicate条件的键值对
+   *
    * @param predicate returns true if an item with the given key should be removed
    * @return number of the items removed from the cache
    */
@@ -58,6 +62,7 @@ public interface MemoryCache<K, V> {
 
   /**
    * Find if any of the items from the cache whose keys match the specified predicate.
+   * 查询是否存在满足predicate条件的cache对象
    *
    * @param predicate returns true if an item with the given key matches
    * @return true if the predicate was found in the cache, false otherwise

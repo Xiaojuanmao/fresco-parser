@@ -16,11 +16,16 @@ import com.facebook.imagepipeline.image.EncodedImage;
 /**
  * Used by {@link NetworkFetcher} to encapsulate the state of one network fetch.
  *
+ * 封装了一次网络fetch的状态
+ *
  * <p>Implementations can subclass this to store additional fetch-scoped fields.
  */
 public class FetchState {
 
+  // 等待被通知的consumer，这里的对象是EncodedImage
   private final Consumer<EncodedImage> mConsumer;
+
+  // 具体需要producer来执行的工作内容
   private final ProducerContext mContext;
   private long mLastIntermediateResultTimeMs;
 
