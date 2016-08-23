@@ -100,15 +100,15 @@ public class ImagePipelineFactory {
 
   private final ImagePipelineConfig mConfig; //　一个ImagePipeline需要使用的到一些辅助类集合
   private CountingMemoryCache<CacheKey, CloseableImage>
-      mBitmapCountingMemoryCache; //　
-  private MemoryCache<CacheKey, CloseableImage> mBitmapMemoryCache;
-  private CountingMemoryCache<CacheKey, PooledByteBuffer> mEncodedCountingMemoryCache;
+      mBitmapCountingMemoryCache; //　一个带有统计容量以及重用功能的map类
+  private MemoryCache<CacheKey, CloseableImage> mBitmapMemoryCache; // cache的接口
+  private CountingMemoryCache<CacheKey, PooledByteBuffer> mEncodedCountingMemoryCache; // 缓存已经解码过后的字节数组
   private MemoryCache<CacheKey, PooledByteBuffer> mEncodedMemoryCache;
   private BufferedDiskCache mMainBufferedDiskCache;
   private FileCache mMainFileCache;
-  private ImageDecoder mImageDecoder;
-  private ImagePipeline mImagePipeline;
-  private ProducerFactory mProducerFactory;
+  private ImageDecoder mImageDecoder; // 用来图片解码的类
+  private ImagePipeline mImagePipeline; // 又是个大家伙，主要靠这个大类来统筹做事
+  private ProducerFactory mProducerFactory; // 可以理解成生产力工厂，能够方便的新建producer实例，producer有各式各样的实现，有专门用来decode等等
   private ProducerSequenceFactory mProducerSequenceFactory;
   private BufferedDiskCache mSmallImageBufferedDiskCache;
   private FileCache mSmallImageFileCache;

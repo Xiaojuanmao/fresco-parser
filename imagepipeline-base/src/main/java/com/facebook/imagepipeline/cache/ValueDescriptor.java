@@ -10,6 +10,8 @@ package com.facebook.imagepipeline.cache;
 
 /**
  * Interface used to get the information about the values.
+ * 用来获取V一些信息的接口
+ * 这里主要是获取V所占的字节数
  */
 public interface ValueDescriptor<V> {
 

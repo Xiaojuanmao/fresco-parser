@@ -14,6 +14,9 @@ import java.io.InputStream;
 
 /**
  * A factory to create instances of PooledByteBuffer and PooledByteBufferOutputStream
+ *
+ * 用来创建PooledByteBuffer和PooledByteBufferOutputStream实例对象的
+ *
  */
 public interface PooledByteBufferFactory {
 

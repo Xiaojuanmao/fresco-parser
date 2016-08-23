@@ -22,6 +22,8 @@ import com.facebook.common.references.CloseableReference;
 /**
  * A factory to provide instances of {@link NativePooledByteBuffer} and
  * {@link NativePooledByteBufferOutputStream}
+ *
+ * 一个用来创建NativePooledByteBuffer和NativePooledByteBufferOutputStream实例的工厂类
  */
 @ThreadSafe
 public class NativePooledByteBufferFactory implements PooledByteBufferFactory {

@@ -22,16 +22,20 @@ import com.android.internal.util.Predicate;
 
 /**
  * Map that keeps track of the elements order (according to the LRU policy) and their size.
+ *
+ * 一个参考LRU策略来设计的并结合item本身的大小，用来管理元素的类
  */
+
 @ThreadSafe
 public class CountingLruMap<K, V> {
 
+  // 用来统计并返回V实例大小的工具类
   private final ValueDescriptor<V> mValueDescriptor;
 
   @GuardedBy("this")
-  private final LinkedHashMap<K, V> mMap = new LinkedHashMap<>();
+  private final LinkedHashMap<K, V> mMap = new LinkedHashMap<>(); // 真正用来存储的类，一个有序的哈希表
   @GuardedBy("this")
-  private int mSizeInBytes = 0;
+  private int mSizeInBytes = 0; // map中存放的所有元素总大小
 
   public CountingLruMap(ValueDescriptor<V> valueDescriptor) {
     mValueDescriptor = valueDescriptor;

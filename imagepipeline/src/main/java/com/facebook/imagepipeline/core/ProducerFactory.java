@@ -59,26 +59,36 @@ import com.facebook.imagepipeline.producers.ThumbnailBranchProducer;
 import com.facebook.imagepipeline.producers.ThumbnailProducer;
 import com.facebook.imagepipeline.producers.WebpTranscodeProducer;
 
+/**
+ * 一个用来生成能够处理各种任务的producer的工厂类
+ * 主要被ProducerSequenceFactory用到了
+ */
+
 public class ProducerFactory {
   // Local dependencies
+  /**
+   * ContentResolver通过ContentProvider来获取与其他应用共享的数据
+   * ContentProvider负责组织应用程序数据，向其他应用提供数据
+   * ContentResolver负责获取ContentProvider提供的数据，以及修改/添加/更新数据等
+   */
   private ContentResolver mContentResolver;
-  private Resources mResources;
-  private AssetManager mAssetManager;
+  private Resources mResources; // 用来获取本地resource资源
+  private AssetManager mAssetManager; // 用来获取asset文件夹下的资源
 
   // Decode dependencies
-  private final ByteArrayPool mByteArrayPool;
-  private final ImageDecoder mImageDecoder;
-  private final ProgressiveJpegConfig mProgressiveJpegConfig;
-  private final boolean mDownsampleEnabled;
+  private final ByteArrayPool mByteArrayPool; // 一个字节数组的池，实现类有俩: GenericBytePool和SoftRefBytePool
+  private final ImageDecoder mImageDecoder; // 专门用来decode的工具类,实际上只处理了针对不同图片类型的操作，具体的decode还是在PlatformDecoder的实现类里进行
+  private final ProgressiveJpegConfig mProgressiveJpegConfig; // 支持渐进式jpeg解码的辅助类
+  private final boolean mDownsampleEnabled; // 是否允许向下采样，暂时不清楚有啥用
   private final boolean mResizeAndRotateEnabledForNetwork;
   private final boolean mDecodeFileDescriptorEnabled;
 
   // Dependencies used by multiple steps
-  private final ExecutorSupplier mExecutorSupplier;
-  private final PooledByteBufferFactory mPooledByteBufferFactory;
+  private final ExecutorSupplier mExecutorSupplier; // 这个就是一大堆线程池的池子，能提供处理各种工作的线程池
+  private final PooledByteBufferFactory mPooledByteBufferFactory; // 用来创建一些处理byte的buffer以及stream的工厂类接口
 
   // Cache dependencies
-  private final BufferedDiskCache mDefaultBufferedDiskCache;
+  private final BufferedDiskCache mDefaultBufferedDiskCache; //
   private final BufferedDiskCache mSmallImageBufferedDiskCache;
   private final MemoryCache<CacheKey, PooledByteBuffer> mEncodedMemoryCache;
   private final MemoryCache<CacheKey, CloseableImage> mBitmapMemoryCache;

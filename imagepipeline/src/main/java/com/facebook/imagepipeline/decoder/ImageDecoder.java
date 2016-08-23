@@ -33,6 +33,9 @@ import java.io.InputStream;
  * <p> ImageDecoder implements image type recognition and passes decode requests to
  * specialized methods implemented by subclasses.
  *
+ * 统筹图片decode工作，具体decode过程还是交给了platformDecoder
+ * 根据系统不同的版本有不同decode的方式
+ *
  * On dalvik, it produces 'pinned' purgeable bitmaps.
  *
  * <p> Pinned purgeables behave as specified in
@@ -44,9 +47,9 @@ import java.io.InputStream;
  */
 public class ImageDecoder {
 
-  private final AnimatedImageFactory mAnimatedImageFactory;
+  private final AnimatedImageFactory mAnimatedImageFactory; // 主要对gif以及webp这两种动图的支持
   private final Bitmap.Config mBitmapConfig;
-  private final PlatformDecoder mPlatformDecoder;
+  private final PlatformDecoder mPlatformDecoder; // 有关平台的decoder类
 
   public ImageDecoder(
       final AnimatedImageFactory animatedImageFactory,
@@ -60,6 +63,9 @@ public class ImageDecoder {
   /**
    * Decodes image.
    *
+   * 开始根据编码来decode出图片
+   * CloseableImage
+   *
    * @param encodedImage input image (encoded bytes plus meta data)
    * @param length if image type supports decoding incomplete image then determines where
    *   the image data should be cut for decoding.
@@ -71,12 +77,20 @@ public class ImageDecoder {
       final int length,
       final QualityInfo qualityInfo,
       final ImageDecodeOptions options) {
+    /**
+     * 首先获取一次encodedImage的类型
+     * 如果为未知，则再通过image编码的格式再强行匹配一次
+     */
     ImageFormat imageFormat = encodedImage.getImageFormat();
     if (imageFormat == null || imageFormat == ImageFormat.UNKNOWN) {
       imageFormat = ImageFormatChecker.getImageFormat_WrapIOException(
           encodedImage.getInputStream());
     }
 
+      /**
+       * 根据不同类型的图片来分配任务
+       * 最后会把任务委托给mPlatformDecoder
+       */
     switch (imageFormat) {
       case UNKNOWN:
         throw new IllegalArgumentException("unknown image format");

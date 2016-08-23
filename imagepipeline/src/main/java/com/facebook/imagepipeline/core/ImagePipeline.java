@@ -49,12 +49,13 @@ import com.android.internal.util.Predicate;
 /**
  * The entry point for the image pipeline.
  */
+
 @ThreadSafe
 public class ImagePipeline {
   private static final CancellationException PREFETCH_EXCEPTION =
       new CancellationException("Prefetching is not enabled");
 
-  private final ProducerSequenceFactory mProducerSequenceFactory;
+  private final ProducerSequenceFactory mProducerSequenceFactory; // 用来
   private final RequestListener mRequestListener;
   private final Supplier<Boolean> mIsPrefetchEnabledSupplier;
   private final MemoryCache<CacheKey, CloseableImage> mBitmapMemoryCache;

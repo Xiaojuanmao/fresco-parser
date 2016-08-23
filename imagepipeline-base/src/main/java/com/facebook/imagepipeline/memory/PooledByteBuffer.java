@@ -14,6 +14,10 @@ import java.io.Closeable;
 /**
  * A 'pooled' byte-buffer abstraction. Represents an immutable sequence of bytes stored off the
  * java heap.
+ *
+ * 代表了一串存储在java堆中不可改变的字节串
+ * 抽象了一些方法，读指定位置的，读中间一段byte[]等等方法
+ *
  */
 public interface PooledByteBuffer extends Closeable {
 
