@@ -34,6 +34,8 @@ import javax.annotation.concurrent.Immutable;
  * Class that contains all the information for an encoded image, both the image bytes (held on
  * a byte buffer or a supplier of input streams) and the extracted meta data that is useful for
  * image transforms.
+ * 一个包含解码后的图片所有的信息的类
+ * image的字节码信息存储在pooledbytebuffer中或者在一个inputStream里
  *
  * <p>Only one of the input stream supplier or the byte buffer can be set. If using an input stream
  * supplier, the methods that return a byte buffer will simply return null. However, getInputStream
@@ -53,6 +55,7 @@ public class EncodedImage implements Closeable {
 
   // Only one of this will be set. The EncodedImage can either be backed by a ByteBuffer or a
   // Supplier of InputStream, but not both.
+  // 下面这两个类只会被set一个
   private final @Nullable CloseableReference<PooledByteBuffer> mPooledByteBufferRef;
   private final @Nullable Supplier<FileInputStream> mInputStreamSupplier;
 
@@ -82,6 +85,7 @@ public class EncodedImage implements Closeable {
 
   /**
    * Returns the cloned encoded image if the parameter received is not null, null otherwise.
+   * 用于克隆一个新的encodedImage
    *
    * @param encodedImage the EncodedImage to clone
    */
@@ -92,8 +96,10 @@ public class EncodedImage implements Closeable {
   public EncodedImage cloneOrNull() {
     EncodedImage encodedImage;
     if (mInputStreamSupplier != null) {
+      // 原encodedImage设置的是inputStream
         encodedImage = new EncodedImage(mInputStreamSupplier, mStreamSize);
     } else {
+      // 原encodedImage设置的是pooledbytebuffer
       CloseableReference<PooledByteBuffer> pooledByteBufferRef =
           CloseableReference.cloneOrNull(mPooledByteBufferRef);
       try {
@@ -137,6 +143,9 @@ public class EncodedImage implements Closeable {
   /**
    * Returns an InputStream from the internal InputStream Supplier if it's not null. Otherwise
    * returns an InputStream for the internal buffer reference if valid and null otherwise.
+   *
+   * 如果设置了inputStream，则直接返回
+   * 如果设置的是pooledByteBuffer，则通过PooledByteBufferInputStream来转换
    *
    * <p>The caller has to close the InputStream after using it.
    */

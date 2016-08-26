@@ -15,6 +15,7 @@ import com.facebook.imagepipeline.memory.PooledByteBuffer;
 
 /**
  * Remove image transform meta data producer
+ * 根据输入的图像元数据来解码的producer
  *
  * <p>Remove the {@link ImageTransformMetaData} object from the results passed down from the next
  * producer, and adds it to the result that it returns to the consumer.

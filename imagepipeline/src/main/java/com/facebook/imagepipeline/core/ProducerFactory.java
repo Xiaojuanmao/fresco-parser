@@ -88,11 +88,11 @@ public class ProducerFactory {
   private final PooledByteBufferFactory mPooledByteBufferFactory; // 用来创建一些处理byte的buffer以及stream的工厂类接口
 
   // Cache dependencies
-  private final BufferedDiskCache mDefaultBufferedDiskCache; //
+  private final BufferedDiskCache mDefaultBufferedDiskCache;
   private final BufferedDiskCache mSmallImageBufferedDiskCache;
   private final MemoryCache<CacheKey, PooledByteBuffer> mEncodedMemoryCache;
   private final MemoryCache<CacheKey, CloseableImage> mBitmapMemoryCache;
-  private final CacheKeyFactory mCacheKeyFactory;
+  private final CacheKeyFactory mCacheKeyFactory; // 用来生成cachekey，为cache等组件提供服务
   private final int mForceSmallCacheThresholdBytes;
 
   // Postproc dependencies

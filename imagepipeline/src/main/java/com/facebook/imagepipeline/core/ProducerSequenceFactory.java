@@ -47,15 +47,16 @@ import com.facebook.imagepipeline.request.ImageRequest;
 
 public class ProducerSequenceFactory {
 
-  private final ProducerFactory mProducerFactory;
-  private final NetworkFetcher mNetworkFetcher;
+  private final ProducerFactory mProducerFactory; // 提供了构造各种producer的接口
+  private final NetworkFetcher mNetworkFetcher; // 用来进行网络请求的
   private final boolean mResizeAndRotateEnabledForNetwork;
   private final boolean mWebpSupportEnabled;
   private final boolean mDownsampleEnabled;
-  private final ThreadHandoffProducerQueue mThreadHandoffProducerQueue;
+  private final ThreadHandoffProducerQueue mThreadHandoffProducerQueue; // 一个runnable队列
   private final int mThrottlingMaxSimultaneousRequests;
 
   // Saved sequences
+  // 暂时还不清楚下面这一系列producer有什么用
   @VisibleForTesting Producer<CloseableReference<CloseableImage>> mNetworkFetchSequence;
   @VisibleForTesting Producer<EncodedImage> mBackgroundNetworkFetchToEncodedMemorySequence;
   @VisibleForTesting Producer<CloseableReference<PooledByteBuffer>> mEncodedImageProducerSequence;
@@ -95,6 +96,8 @@ public class ProducerSequenceFactory {
 
   /**
    * Returns a sequence that can be used for a request for an encoded image.
+   *
+   * 返回一个能够用来解码图片的producer
    *
    * @param imageRequest the request that will be submitted
    * @return the sequence that should be used to process the request
