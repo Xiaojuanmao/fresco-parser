@@ -145,7 +145,7 @@ public class EncodedImage implements Closeable {
    * returns an InputStream for the internal buffer reference if valid and null otherwise.
    *
    * 如果设置了inputStream，则直接返回
-   * 如果设置的是pooledByteBuffer，则通过PooledByteBufferInputStream来转换
+   * 如果设置的是pooledByteBuffer，则通过PooledByteBufferInputStream来转换成一个InputStream并返回
    *
    * <p>The caller has to close the InputStream after using it.
    */
@@ -252,6 +252,10 @@ public class EncodedImage implements Closeable {
   /**
    * Returns true if the image is a JPEG and its data is already complete at the specified length,
    * false otherwise.
+   *
+   * 前提是在图片格式是JPEG的情况下
+   * 判断在length长度的位置，是否是一张完整的图片
+   *
    */
   public boolean isCompleteAt(int length) {
     if (mImageFormat != ImageFormat.JPEG) {
@@ -283,6 +287,8 @@ public class EncodedImage implements Closeable {
 
   /**
    * Sets the encoded image meta data.
+   *
+   * 从元数据里面解析出关于图片的一些尺寸等信息
    */
   public void parseMetaData() {
     final ImageFormat imageFormat = ImageFormatChecker.getImageFormat_WrapIOException(
@@ -291,8 +297,14 @@ public class EncodedImage implements Closeable {
     // Dimensions decoding is not yet supported for WebP since BitmapUtil.decodeDimensions has a
     // bug where it will return 100x100 for some WebPs even though those are not its actual
     // dimensions
+    /**
+     * 暂时不支持某些WebPs格式图片的解码工作
+     */
     if (!ImageFormat.isWebpFormat(imageFormat)) {
+
+      // 通过BitmapFactory提供的一系列方法可以拿到关于图片的尺寸大小,也就是isJustInBounds那一套
       Pair<Integer, Integer> dimensions = BitmapUtil.decodeDimensions(getInputStream());
+
       if (dimensions != null) {
         mWidth = dimensions.first;
         mHeight = dimensions.second;
@@ -312,7 +324,6 @@ public class EncodedImage implements Closeable {
 
   /**
    * Copy the meta data from another EncodedImage.
-   *
    * @param encodedImage the EncodedImage to copy the meta data from.
    */
   public void copyMetaDataFrom(EncodedImage encodedImage) {

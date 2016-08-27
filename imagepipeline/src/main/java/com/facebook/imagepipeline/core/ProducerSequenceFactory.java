@@ -128,6 +128,11 @@ public class ProducerSequenceFactory {
     return getNetworkFetchToEncodedMemoryPrefetchSequence();
   }
 
+  /**
+   * 验证ImageRequest是否有效
+   *
+   * @param imageRequest
+   */
   private static void validateEncodedImageRequest(ImageRequest imageRequest) {
     Preconditions.checkNotNull(imageRequest);
     Preconditions.checkArgument(UriUtil.isNetworkUri(imageRequest.getSourceUri()));

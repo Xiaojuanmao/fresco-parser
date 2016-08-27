@@ -33,6 +33,8 @@ public class RemoveImageTransformMetaDataProducer
   public void produceResults(
       Consumer<CloseableReference<PooledByteBuffer>> consumer,
       ProducerContext context) {
+
+    // 新建一个consumer，并调用producer的produceResult方法
     mInputProducer.produceResults(new RemoveImageTransformMetaDataConsumer(consumer), context);
   }
 

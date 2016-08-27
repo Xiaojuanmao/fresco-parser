@@ -18,8 +18,13 @@ import com.facebook.common.logging.FLog;
  * Base implementation of Consumer that implements error handling conforming to the
  * Consumer's contract.
  *
+ * consumer默认的实现类，进行了一些错误的处理
+ * 在Consumer原有的接口上实现并封装并进行了预处理
+ * 又开放了一系列对应的Impl抽象方法留给子类
+ *
  * <p> This class also prevents execution of callbacks if one of final methods was called before:
  * onFinish(isLast = true), onFailure or onCancellation.
+ *
  *
  * <p> All callbacks are executed within a synchronized block, so that clients can act as if all
  * callbacks are called on single thread.
@@ -32,6 +37,8 @@ public abstract class BaseConsumer<T> implements Consumer<T> {
   /**
    * Set to true when onNewResult(isLast = true), onFailure or onCancellation is called. Further
    * calls to any of the 3 methods are not propagated
+   *
+   * 用来标记producer是否已经通知过consumer
    */
   private boolean mIsFinished;
 

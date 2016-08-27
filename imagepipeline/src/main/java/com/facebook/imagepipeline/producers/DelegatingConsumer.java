@@ -10,9 +10,12 @@ package com.facebook.imagepipeline.producers;
 
 /**
  * Delegating consumer.
+ * 一个代理的consumer，直接的作用对象还是在mConsumer上
+ * 并不太清楚这么做的目的是什么
  */
 public abstract class DelegatingConsumer<I, O> extends BaseConsumer<I> {
 
+  // 实际被作用的consumer
   private final Consumer<O> mConsumer;
 
   public DelegatingConsumer(Consumer<O> consumer) {

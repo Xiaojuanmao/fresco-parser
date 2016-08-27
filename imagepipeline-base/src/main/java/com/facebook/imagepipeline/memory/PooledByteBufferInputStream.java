@@ -18,6 +18,10 @@ import com.facebook.common.internal.VisibleForTesting;
 
 /**
  * An InputStream implementation over a {@link PooledByteBuffer} instance
+ *
+ * 只是借着InputStream的类型
+ * 将read等操作都委托给了pooledbytebuffer
+ *
  */
 @NotThreadSafe
 public class PooledByteBufferInputStream extends InputStream {
@@ -32,6 +36,9 @@ public class PooledByteBufferInputStream extends InputStream {
 
   /**
    * Creates a new inputstream instance over the specific buffer.
+   *
+   * 传入一个PooledByteBuffer实例，将其包装成InputStream类型
+   *
    * @param pooledByteBuffer the buffer to read from
    */
   public PooledByteBufferInputStream(PooledByteBuffer pooledByteBuffer) {

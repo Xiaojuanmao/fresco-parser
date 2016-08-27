@@ -92,6 +92,7 @@ public final class BitmapUtil {
    */
   public static @Nullable Pair<Integer, Integer> decodeDimensions(InputStream is) {
     Preconditions.checkNotNull(is);
+    // 从pool里面拿一块字节buffer
     ByteBuffer byteBuffer = DECODE_BUFFERS.acquire();
     if (byteBuffer == null) {
       byteBuffer = ByteBuffer.allocate(DECODE_BUFFER_SIZE);
@@ -99,6 +100,10 @@ public final class BitmapUtil {
     BitmapFactory.Options options = new BitmapFactory.Options();
     options.inJustDecodeBounds = true;
     try {
+      /**
+       * inTempStorage参数用来指定decode
+       * 用到一片临时内存区域
+       */
       options.inTempStorage = byteBuffer.array();
       BitmapFactory.decodeStream(is, null, options);
       return (options.outWidth == -1 || options.outHeight == -1) ?
