@@ -34,17 +34,19 @@ import bolts.Task;
 /**
  * BufferedDiskCache provides get and put operations to take care of scheduling disk-cache
  * read/writes.
+ *
+ * 此类提供对磁盘文件缓存的读写功能
  */
 public class BufferedDiskCache {
   private static final Class<?> TAG = BufferedDiskCache.class;
 
-  private final FileCache mFileCache;
-  private final PooledByteBufferFactory mPooledByteBufferFactory;
-  private final PooledByteStreams mPooledByteStreams;
-  private final Executor mReadExecutor;
-  private final Executor mWriteExecutor;
-  private final StagingArea mStagingArea;
-  private final ImageCacheStatsTracker mImageCacheStatsTracker;
+  private final FileCache mFileCache; // 磁盘文件缓存的一系列接口
+  private final PooledByteBufferFactory mPooledByteBufferFactory; // 用来创建PooledByteBuffer和PooledByteBufferOutputStream实例对象
+  private final PooledByteStreams mPooledByteStreams; // 一个结合了ByteArrayPool的stream处理类
+  private final Executor mReadExecutor; // 用来读取文件的线程池
+  private final Executor mWriteExecutor; // 用来写入文件的线程池
+  private final StagingArea mStagingArea; // 对Map进行了封装，存储着CacheKey以及EncodedImage对象的键值对
+  private final ImageCacheStatsTracker mImageCacheStatsTracker; // 用来报告当前图片缓存状态的辅助类
 
   public BufferedDiskCache(
       FileCache fileCache,
@@ -78,6 +80,11 @@ public class BufferedDiskCache {
    * Performs a key-value look up in the disk cache. If no value is found in the staging area,
    * then disk cache checks are scheduled on a background thread. Any error manifests itself as a
    * cache miss, i.e. the returned Task resolves to false.
+   *
+   * 先检查在StatingArea以及fileCache里面是否存在key对应的值
+   * - 是 返回true
+   * - 否 构造一个Task，查询磁盘文件是否存在key对应的值
+   *
    * @param key
    * @return Task that resolves to true if an element is found, or false otherwise
    */

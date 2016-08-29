@@ -16,6 +16,8 @@ import com.facebook.common.internal.VisibleForTesting;
 
 /**
  * Uses ExecutorService to move further computation to different thread
+ *
+ * 构造好runnable之后，将runnable加入到实现构造好的queue中
  */
 public class ThreadHandoffProducer<T> implements Producer<T> {
 

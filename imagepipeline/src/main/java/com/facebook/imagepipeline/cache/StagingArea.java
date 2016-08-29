@@ -27,6 +27,10 @@ import com.facebook.cache.common.CacheKey;
  * This is class encapsulates Map that maps ImageCacheKeys to EncodedImages pointing to
  * PooledByteBuffers. It is used by SimpleImageCache to store values that are being written
  * to disk cache, so that they can be returned by parallel cache get operations.
+ *
+ * 对一个存储这CacheKey和EncodedImage键值对进行了封装
+ * 封装了一些同步的方法来进行键值对的读写
+ *
  */
 public class StagingArea {
   private static final Class<?> TAG = StagingArea.class;

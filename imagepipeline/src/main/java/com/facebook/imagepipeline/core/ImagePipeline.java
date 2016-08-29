@@ -48,6 +48,9 @@ import com.android.internal.util.Predicate;
 
 /**
  * The entry point for the image pipeline.
+ *
+ * 图像流水线的入口
+ * 多条功能流水线主要在{@link ProducerSequenceFactory}类里面,由各种Producer组成
  */
 
 @ThreadSafe
@@ -55,16 +58,16 @@ public class ImagePipeline {
   private static final CancellationException PREFETCH_EXCEPTION =
       new CancellationException("Prefetching is not enabled");
 
-  private final ProducerSequenceFactory mProducerSequenceFactory; // 用来
-  private final RequestListener mRequestListener;
-  private final Supplier<Boolean> mIsPrefetchEnabledSupplier;
-  private final MemoryCache<CacheKey, CloseableImage> mBitmapMemoryCache;
-  private final MemoryCache<CacheKey, PooledByteBuffer> mEncodedMemoryCache;
-  private final BufferedDiskCache mMainBufferedDiskCache;
+  private final ProducerSequenceFactory mProducerSequenceFactory; // 包含着多条生产流水线(Producer)的工厂类
+  private final RequestListener mRequestListener; // 用来监听流水线上的ImageReuqest进度以及反馈结果进行监测
+  private final Supplier<Boolean> mIsPrefetchEnabledSupplier; // 是否允许预解析的工作
+  private final MemoryCache<CacheKey, CloseableImage> mBitmapMemoryCache; // 有关bitmap的内存缓存
+  private final MemoryCache<CacheKey, PooledByteBuffer> mEncodedMemoryCache; // 有关图片原始字节码的内存缓存
+  private final BufferedDiskCache mMainBufferedDiskCache; // 提供对磁盘文件进行读写管理的类
   private final BufferedDiskCache mSmallImageBufferedDiskCache;
-  private final CacheKeyFactory mCacheKeyFactory;
-  private final ThreadHandoffProducerQueue mThreadHandoffProducerQueue;
-  private AtomicLong mIdCounter;
+  private final CacheKeyFactory mCacheKeyFactory; // 构造CacheKey的工厂类
+  private final ThreadHandoffProducerQueue mThreadHandoffProducerQueue; // 一个存放Runnable队列
+  private AtomicLong mIdCounter; // 具有原子操作性质的long
 
   public ImagePipeline(
       ProducerSequenceFactory producerSequenceFactory,

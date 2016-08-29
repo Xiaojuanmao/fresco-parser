@@ -109,12 +109,12 @@ public class ImagePipelineFactory {
   private ImageDecoder mImageDecoder; // 用来图片解码的类
   private ImagePipeline mImagePipeline; // 又是个大家伙，主要靠这个大类来统筹做事
   private ProducerFactory mProducerFactory; // 可以理解成生产力工厂，能够方便的新建producer实例，producer有各式各样的实现，有专门用来decode等等
-  private ProducerSequenceFactory mProducerSequenceFactory;
-  private BufferedDiskCache mSmallImageBufferedDiskCache;
-  private FileCache mSmallImageFileCache;
+  private ProducerSequenceFactory mProducerSequenceFactory; // 利用楼上的那个能构造出多种多样的producer类，并将这些producer组合成一条条的流水线来进行实际的生产工作
+  private BufferedDiskCache mSmallImageBufferedDiskCache; // 用来缓存小图片的内存缓存
+  private FileCache mSmallImageFileCache; // 用来缓存小图片的磁盘缓存
 
-  private PlatformBitmapFactory mPlatformBitmapFactory;
-  private PlatformDecoder mPlatformDecoder;
+  private PlatformBitmapFactory mPlatformBitmapFactory; // 与android系统版本相关的创建bitmap的工厂类
+  private PlatformDecoder mPlatformDecoder; // 与android系统版本有关的，用来进行图片decode工作的
 
   private AnimatedFactory mAnimatedFactory;
 

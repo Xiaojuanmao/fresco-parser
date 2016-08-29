@@ -45,6 +45,15 @@ import com.facebook.imagepipeline.producers.ThumbnailBranchProducer;
 import com.facebook.imagepipeline.producers.ThumbnailProducer;
 import com.facebook.imagepipeline.request.ImageRequest;
 
+/**
+ * 此类实际上是用ProducerFactory进行了一个流水线式的组装
+ * ProducerFactory能够构造出多样化的producer，这些producer能够对输入的(也就是统一输入类型Producer<T>)
+ * 类型进行处理，并返回另一个与输入类型相同的Producer<T>
+ * 也就是类似于工厂里面流水线一样，从原始的result，经过每一种做不同操作的producer的操作，最后在整条流水线上产出一个产品
+ * 这些producer仅仅只是预先包装好了，并没有实际的执行，和reactive一套思想有点类似，在最后一刻才会被触发，完成整个生产工作
+ *
+ * 生产流水线工厂
+ */
 public class ProducerSequenceFactory {
 
   private final ProducerFactory mProducerFactory; // 提供了构造各种producer的接口
@@ -57,8 +66,15 @@ public class ProducerSequenceFactory {
 
   // Saved sequences
   // 暂时还不清楚下面这一系列producer有什么用
-  @VisibleForTesting Producer<CloseableReference<CloseableImage>> mNetworkFetchSequence;
-  @VisibleForTesting Producer<EncodedImage> mBackgroundNetworkFetchToEncodedMemorySequence;
+  /**
+   * 看到后面算是理解了
+   * 下面这些Producer能够理解成本工厂类中的一条条流水线
+   * 每条流水线的构造是不同的，也负责了不同的工序
+   * 例如第一条就负责从网络获取图片、磁盘缓存、内存缓存等一系列的操作
+   * 其他的流水线也是类似
+   */
+  @VisibleForTesting Producer<CloseableReference<CloseableImage>> mNetworkFetchSequence; // 从网络获取image的流水线
+  @VisibleForTesting Producer<EncodedImage> mBackgroundNetworkFetchToEncodedMemorySequence; // 从内存缓存中解析出image的流水线
   @VisibleForTesting Producer<CloseableReference<PooledByteBuffer>> mEncodedImageProducerSequence;
   @VisibleForTesting Producer<Void> mNetworkFetchToEncodedMemoryPrefetchSequence;
   private Producer<EncodedImage> mCommonNetworkFetchToEncodedMemorySequence;
@@ -97,7 +113,7 @@ public class ProducerSequenceFactory {
   /**
    * Returns a sequence that can be used for a request for an encoded image.
    *
-   * 返回一个能够用来解码图片的producer
+   * 返回一个在内部构造好了consumer的producer
    *
    * @param imageRequest the request that will be submitted
    * @return the sequence that should be used to process the request
@@ -116,6 +132,9 @@ public class ProducerSequenceFactory {
 
   /**
    * Returns a sequence that can be used for a prefetch request for an encoded image.
+   *
+   * 返回一个能够用来进行图片请求预处理的producer
+   * 可能是和bitmap的inJustDecodeBounds类似的环节
    *
    * <p>Guaranteed to return the same sequence as
    * {@code getEncodedImageProducerSequence(request)}, except that it is pre-pended with a
@@ -216,6 +235,11 @@ public class ProducerSequenceFactory {
   /**
    * background-thread hand-off -> multiplex -> encoded cache ->
    * disk cache -> (webp transcode) -> network fetch.
+   *
+   * 通过producerFactory构造出一个producer，该producer负责构造出一个runnable并将其放入了queue中
+   * 让其所有的工作都在executor提供的线程中执行
+   *
+   * 这里包装的是流水线的最后一个步骤，规范了producer执行过程中在一个线程池中被执行
    */
   private synchronized Producer<EncodedImage>
   getBackgroundNetworkFetchToEncodedMemorySequence() {
@@ -232,6 +256,9 @@ public class ProducerSequenceFactory {
   /**
    * swallow-result -> background-thread hand-off -> multiplex -> encoded cache ->
    * disk cache -> (webp transcode) -> network fetch.
+   *
+   * 构造另外一条生产流水线,只不过在最后一道工序的时候不会将结果返回，而是swallow掉
+   * 生产线后面的拼接与之前对于EncodedImage的流水线是一样的
    */
   private synchronized Producer<Void> getNetworkFetchToEncodedMemoryPrefetchSequence() {
     if (mNetworkFetchToEncodedMemoryPrefetchSequence == null) {
@@ -244,15 +271,26 @@ public class ProducerSequenceFactory {
 
   /**
    * multiplex -> encoded cache -> disk cache -> (webp transcode) -> network fetch.
+   *
+   * 关于EncodedImage流水线上的其他的工序
    */
   private synchronized Producer<EncodedImage> getCommonNetworkFetchToEncodedMemorySequence() {
     if (mCommonNetworkFetchToEncodedMemorySequence == null) {
+      /**
+       * 先创建了一个网络请求的producer
+       * 获取图片的源数据后，在第一道工序后面
+       * 又添加了磁盘缓存的工序以及内存缓存的工序
+       */
       Producer<EncodedImage> inputProducer =
           newEncodedCacheMultiplexToTranscodeSequence(
               mProducerFactory.newNetworkFetchProducer(mNetworkFetcher));
       mCommonNetworkFetchToEncodedMemorySequence =
           ProducerFactory.newAddImageTransformMetaDataProducer(inputProducer);
 
+      /**
+       * 根据是否支持图片的旋转以及resize
+       * 来决定是否需要加上这道工序
+       */
       if (mResizeAndRotateEnabledForNetwork && !mDownsampleEnabled) {
         mCommonNetworkFetchToEncodedMemorySequence =
             mProducerFactory.newResizeAndRotateProducer(
@@ -269,6 +307,8 @@ public class ProducerSequenceFactory {
    *   -> exif resize and rotate -> exif thumbnail creation
    *   -> local image resize and rotate -> add meta data producer -> multiplex -> encoded cache ->
    *   (webp transcode) -> local file fetch.
+   *
+   *   这条流水线好长啊= =，从本地文件中获取image
    */
   private synchronized Producer<CloseableReference<CloseableImage>>
   getLocalImageFileFetchSequence() {
@@ -284,6 +324,8 @@ public class ProducerSequenceFactory {
   /**
    * Bitmap cache get -> thread hand off -> multiplex -> bitmap cache ->
    * local video thumbnail
+   *
+   * 用来获取本地视频第一帧缩略图的流水线
    */
   private synchronized Producer<CloseableReference<CloseableImage>>
   getLocalVideoFileFetchSequence() {
@@ -305,6 +347,8 @@ public class ProducerSequenceFactory {
    *     -> exif thumbnail creation
    *   -> local image resize and rotate -> add meta data producer -> multiplex -> encoded cache ->
    *   (webp transcode) -> local content uri fetch.
+   *
+   *   根据提供的本地Uri来进行解析并返回image的流水线
    */
   private synchronized Producer<CloseableReference<CloseableImage>>
   getLocalContentUriFetchSequence() {
@@ -330,6 +374,8 @@ public class ProducerSequenceFactory {
    *   -> exif resize and rotate -> exif thumbnail creation
    *   -> local image resize and rotate -> add meta data producer -> multiplex -> encoded cache ->
    *   (webp transcode) -> local resource fetch.
+   *
+   *   从本地资源获取image的流水线
    */
   private synchronized Producer<CloseableReference<CloseableImage>>
   getLocalResourceFetchSequence() {
@@ -421,6 +467,11 @@ public class ProducerSequenceFactory {
 
   /**
    * encoded cache multiplex -> encoded cache -> (disk cache) -> (webp transcode)
+   *
+   * 有关EncodedImage的中间工序
+   * 根据系统是否支持webp来进行生产线的构造
+   * diskCache和encodedMemoryCache也一并包含在了这次流水线中
+   *
    * @param inputProducer producer providing the input to the transcode
    * @return encoded cache multiplex to webp transcode sequence
    */

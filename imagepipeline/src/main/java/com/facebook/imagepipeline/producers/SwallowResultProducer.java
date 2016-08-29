@@ -12,6 +12,9 @@ package com.facebook.imagepipeline.producers;
 /**
  * Swallow result producer.
  *
+ * 在最后将前面producer产生出来的结果直接吃掉了= =
+ * 用来进行预处理
+ *
  * <p>This producer just inserts a consumer that swallows results into the stack of consumers.
  */
 public class SwallowResultProducer<T> implements Producer<Void> {
