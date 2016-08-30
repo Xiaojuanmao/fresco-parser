@@ -17,6 +17,8 @@ import com.facebook.common.util.HashCodeUtil;
 /**
  * Options for resizing.
  *
+ * 重置图片大小，调用方提供想要的图片大小，在decode的时候能够更好的进行采样以及压缩
+ *
  * <p> Describes the target bounds for the image (width, height) in pixels, as well as the
  * downscaling policy to employ.
  */

@@ -163,6 +163,8 @@ public class ProducerSequenceFactory {
   /**
    * Returns a sequence that can be used for a request for a decoded image.
    *
+   * 返回一条流水线，能够按照当前request的内容来查找一个已经decoded好了的image
+   *
    * @param imageRequest the request that will be submitted
    * @return the sequence that should be used to process the request
    */
@@ -188,6 +190,14 @@ public class ProducerSequenceFactory {
     return getDecodedImagePrefetchSequence(getBasicDecodedImageSequence(imageRequest));
   }
 
+  /**
+   * 解析传入的Uri
+   * 来确定应该返回哪一个流水线
+   * 如果是网络的uri，则会返回关于网络请求的流水线
+   *
+   * @param imageRequest
+   * @return
+   */
   private Producer<CloseableReference<CloseableImage>> getBasicDecodedImageSequence(
       ImageRequest imageRequest) {
     Preconditions.checkNotNull(imageRequest);
@@ -223,6 +233,9 @@ public class ProducerSequenceFactory {
    * swallow result if prefetch -> bitmap cache get ->
    * background thread hand-off -> multiplex -> bitmap cache -> decode -> multiplex ->
    * encoded cache -> disk cache -> (webp transcode) -> network fetch.
+   *
+   * 从网络获取图片的流水线
+   *
    */
   private synchronized Producer<CloseableReference<CloseableImage>> getNetworkFetchSequence() {
     if (mNetworkFetchSequence == null) {
@@ -456,6 +469,10 @@ public class ProducerSequenceFactory {
 
   /**
    * Same as {@code newBitmapCacheGetToBitmapCacheSequence} but with an extra DecodeProducer.
+   *
+   * 和{@link #newBitmapCacheGetToBitmapCacheSequence} 方法没啥大的区别
+   * 也就是在中间多加了一道解码的工序,DecodeProducer
+   *
    * @param inputProducer producer providing the input to the decode
    * @return bitmap cache get to decode sequence
    */

@@ -15,6 +15,8 @@ import java.util.Locale;
 
 /**
  * Options for changing the behavior of the {@code ImageDecoder}.
+ *
+ * 用来更改ImageDecoder部分属性的一个类
  */
 @Immutable
 public class ImageDecodeOptions {

@@ -94,6 +94,7 @@ public class ImagePipeline {
   /**
    * Generates unique id for RequestFuture.
    *
+   * 利用带有原子操作性质的类来生成一个自然增长的独一无二的id
    * @return unique id
    */
   private String generateUniqueFutureId() {
@@ -103,6 +104,10 @@ public class ImagePipeline {
   /**
    * Returns a DataSource supplier that will on get submit the request for execution and return a
    * DataSource representing the pending results of the task.
+   *
+   * 构造出一个包含了能够得到数据源的Supplier
+   * DataSource的获得通过传入的ImageRequest来构造出一套产出目标图片的流水线
+   * 并通过方法{@link #submitFetchRequest(Producer, ImageRequest, ImageRequest.RequestLevel, Object)}方法开始请求的工作
    *
    * @param imageRequest the request to submit (what to execute).
    * @param bitmapCacheOnly whether to only look for the image in the bitmap cache
@@ -116,8 +121,10 @@ public class ImagePipeline {
       @Override
       public DataSource<CloseableReference<CloseableImage>> get() {
         if (bitmapCacheOnly) {
+          // 只允许从bitmap缓存中获取图片
           return fetchImageFromBitmapCache(imageRequest, callerContext);
         } else {
+          // 优先从decodedImage中获取图片
           return fetchDecodedImage(imageRequest, callerContext);
         }
       }
@@ -134,6 +141,8 @@ public class ImagePipeline {
   /**
    * Returns a DataSource supplier that will on get submit the request for execution and return a
    * DataSource representing the pending results of the task.
+   *
+   * 和上面的方法类似，只不过请求返回的结果是PooledByteBuffer，也就是存在byte数组池中的字节码
    *
    * @param imageRequest the request to submit (what to execute).
    * @return a DataSource representing pending results and completion of the request
@@ -160,6 +169,9 @@ public class ImagePipeline {
   /**
    * Submits a request for bitmap cache lookup.
    *
+   * 和下面那个方法没啥大的区别
+   * 都是同一条流水线了，只不过在{@link com.facebook.imagepipeline.request.ImageRequest.RequestLevel}上有所不同
+   *
    * @param imageRequest the request to submit
    * @return a DataSource representing the image
    */
@@ -182,6 +194,9 @@ public class ImagePipeline {
   /**
    * Submits a request for execution and returns a DataSource representing the pending decoded
    * image(s).
+   *
+   * 同楼上的那个方法
+   *
    * <p>The returned DataSource must be closed once the client has finished with it.
    * @param imageRequest the request to submit
    * @return a DataSource representing the pending decoded image(s)
@@ -206,6 +221,9 @@ public class ImagePipeline {
    * Submits a request for execution and returns a DataSource representing the pending encoded
    * image(s).
    *
+   * 返回一个有待解码的byte数组封装类
+   * 貌似看到了更多花式玩图的希望0.0
+   *
    * <p> The ResizeOptions in the imageRequest will be ignored for this fetch
    *
    * <p>The returned DataSource must be closed once the client has finished with it.
@@ -226,6 +244,9 @@ public class ImagePipeline {
       // this method returns an encoded image, it should always be read into memory. Therefore, the
       // resize options are ignored to avoid treating the image as if it was to be downsampled
       // during decode.
+      /**
+       * 需要忽略传入的imageRequest的ResizeOptions
+       */
       if (imageRequest.getResizeOptions() != null) {
         imageRequest = ImageRequestBuilder.fromRequest(imageRequest)
             .setResizeOptions(null)

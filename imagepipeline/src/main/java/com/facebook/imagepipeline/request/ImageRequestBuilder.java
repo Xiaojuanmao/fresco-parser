@@ -24,6 +24,9 @@ import static com.facebook.imagepipeline.request.ImageRequest.RequestLevel;
 
 /**
  * Builder class for {@link ImageRequest}s.
+ *
+ * ImageRequest的builder类
+ * 对外构造request主要通过此类，ImageRequest的构造方法已经被封禁
  */
 public class ImageRequestBuilder {
 
