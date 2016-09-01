@@ -14,6 +14,7 @@ import android.net.Uri;
 /**
  * Strongly typed cache key to be used instead of {@link Object}.
  *
+ *
  * <p> {@link #toString}, {@link #equals} and {@link #hashCode} methods must be implemented.
  */
 public interface CacheKey {

@@ -21,6 +21,8 @@ import com.facebook.imagepipeline.listener.RequestListener;
 /**
  * DataSource<CloseableReference<T>> backed by a Producer<CloseableReference<T>>
  *
+ * 此类作为一个转换类，将Producer转换成了一个DataSource类
+ *
  * @param <T>
  */
 @ThreadSafe

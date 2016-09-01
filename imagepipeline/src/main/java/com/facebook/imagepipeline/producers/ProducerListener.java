@@ -16,6 +16,9 @@ import java.util.Map;
 /**
  * Instrumentation for Producers.
  *
+ * 用来监测流水线上的各种事情的发生阶段
+ * 例如流水线启动、流水线上的特殊事件、流水线成功产出、产出失败等等
+ *
  * <p> Implementation of a producer should call these methods when appropriate to notify other
  * components interested in execution progress.
  */

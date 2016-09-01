@@ -37,14 +37,29 @@ public abstract class AbstractProducerToDataSourceAdapter<T> extends AbstractDat
       RequestListener requestListener) {
     mSettableProducerContext = settableProducerContext;
     mRequestListener = requestListener;
+
+      /**
+       * 通知监听器，流水线正式启动
+       */
     mRequestListener.onRequestStart(
         settableProducerContext.getImageRequest(),
         mSettableProducerContext.getCallerContext(),
         mSettableProducerContext.getId(),
         mSettableProducerContext.isPrefetch());
+
+      /**
+       * 流水线启动，开始产出
+       */
     producer.produceResults(createConsumer(), settableProducerContext);
   }
 
+  /**
+   * 创建了最顶层的一个consumer
+   * 这些方法应该是在最后一道工序结束之后才调用的
+   * 在最后一道工序结束之后，会通知mRequestListener
+   *
+   * @return
+   */
   private Consumer<T> createConsumer() {
     return new BaseConsumer<T>() {
       @Override

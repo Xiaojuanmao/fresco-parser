@@ -17,7 +17,6 @@ import com.facebook.imagepipeline.request.ImageRequest;
  *
  * 用来将一些需要处理的上下文信息传递给producer
  *
- *
  * <p> Object implementing this interface is passed to all producers participating in pipeline
  * request {@see Producer#produceResults}. Its responsibility is to instruct producers which image
  * should be fetched/decoded/resized/cached etc. This class also handles request cancellation.

@@ -11,6 +11,8 @@ package com.facebook.imagepipeline.producers;
 
 /**
  * Callbacks that are called when something changes in a request sequence.
+ *
+ * 当流水线上的状态改变的时候，用来进行通知的回调接口
  */
 public interface ProducerContextCallbacks {
 

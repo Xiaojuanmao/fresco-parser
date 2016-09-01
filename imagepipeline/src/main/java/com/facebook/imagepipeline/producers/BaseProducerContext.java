@@ -20,12 +20,15 @@ import com.facebook.imagepipeline.request.ImageRequest;
 /**
  * ProducerContext that can be cancelled. Exposes low level API to manipulate state of the
  * ProducerContext.
+ *
+ * 在ProducerContext的基础上暴露出更多的api给调用方，例如cancel方法
+ * 用来取消整条流水线的工作
  */
 public class BaseProducerContext implements ProducerContext {
-  private final ImageRequest mImageRequest;
-  private final String mId;
-  private final ProducerListener mProducerListener;
-  private final Object mCallerContext;
+  private final ImageRequest mImageRequest; // 整条流水线上的目标
+  private final String mId; // 流水生产线的id,独一无二的一个
+  private final ProducerListener mProducerListener; // 用来提示流水线上的各种事情的发生阶段
+  private final Object mCallerContext; // 暂时没有发现有什么作用
   private final ImageRequest.RequestLevel mLowestPermittedRequestLevel;
 
   @GuardedBy("this")
@@ -37,7 +40,7 @@ public class BaseProducerContext implements ProducerContext {
   @GuardedBy("this")
   private boolean mIsCancelled;
   @GuardedBy("this")
-  private final List<ProducerContextCallbacks> mCallbacks;
+  private final List<ProducerContextCallbacks> mCallbacks; // 一系列回调接口，当内部状态被改变的时候，会逐个通知
 
   public BaseProducerContext(
       ImageRequest imageRequest,
