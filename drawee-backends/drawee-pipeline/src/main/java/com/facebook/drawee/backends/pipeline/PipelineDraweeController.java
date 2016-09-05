@@ -40,6 +40,9 @@ import javax.annotation.Nullable;
  * Drawee controller that bridges the image pipeline with {@link SettableDraweeHierarchy}. <p> The
  * hierarchy's actual image is set to the image(s) obtained by the provided data source. The data
  * source is automatically obtained and closed based on attach / detach calls.
+ *
+ * 此类实现了{@link com.facebook.drawee.interfaces.DraweeController}接口
+ * 用来将Hierarchy和ImagePipeline之间的联系
  */
 public class PipelineDraweeController
     extends AbstractDraweeController<CloseableReference<CloseableImage>, ImageInfo> {
@@ -47,7 +50,7 @@ public class PipelineDraweeController
   private static final Class<?> TAG = PipelineDraweeController.class;
 
   // Components
-  private final Resources mResources;
+  private final Resources mResources; // 用来方便取出本地资源
   private final AnimatedDrawableFactory mAnimatedDrawableFactory;
 
   private @Nullable MemoryCache<CacheKey, CloseableImage> mMemoryCache;

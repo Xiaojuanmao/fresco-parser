@@ -22,6 +22,9 @@ import com.facebook.common.internal.Preconditions;
  * message. Although we would like for defer {@code release} to happen immediately after the current
  * message is done, this is not guaranteed as there might be other messages after the current one,
  * but before the deferred one, pending in the Looper's queue.
+ *
+ * 一个用来延缓release方法执行的组件
+ *
  * <p>
  * onDetach / onAttach events are used for releasing / acquiring resources. However, sometimes we
  * get an onDetach event followed by an onAttach event within the same loop. In order to avoid
@@ -30,6 +33,10 @@ import com.facebook.common.internal.Preconditions;
  * resource release / acquire cycle. If onAttach doesn't happen before the deferred message gets
  * executed, the resources will be released.
  * <p>
+ *
+ * 在接受到onDetach以及onAttach的事件之后，可能会需要释放资源文件等，如果在同一个looper中
+ * 有很多message，有相连着的onDetach和onAttach操作，就会将其合并
+ *
  * This class is not thread-safe and should only be used from the main thread (UI thread).
  */
 public class DeferredReleaser {
