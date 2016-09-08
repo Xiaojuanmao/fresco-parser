@@ -33,6 +33,8 @@ import com.facebook.drawee.interfaces.SimpleDraweeControllerBuilder;
 
 /**
  * Base implementation for Drawee controller builders.
+ *
+ * DraweeeControllerBuilder的基类
  */
 public abstract class AbstractDraweeControllerBuilder <
     BUILDER extends AbstractDraweeControllerBuilder<BUILDER, REQUEST, IMAGE, INFO>,
@@ -41,6 +43,16 @@ public abstract class AbstractDraweeControllerBuilder <
     INFO>
     implements SimpleDraweeControllerBuilder {
 
+  /**
+   * 用来处理加载的gif图自动播放的逻辑
+   * 在Fresco中对于gif图的播放是可控的
+   * 在加载完gif图DraweeController中{@link DraweeController#getAnimatable()}对象，就能够拿到
+   * 一个{@link Animatable}对象
+   *
+   * 关于Animatable，官网是这么解释
+   * Interface that drawables supporting animations should implement.
+   * drawable如果想支持动画,就需要实现这个接口
+   */
   private static final ControllerListener<Object> sAutoPlayAnimationsListener =
       new BaseControllerListener<Object>() {
         @Override
@@ -55,25 +67,25 @@ public abstract class AbstractDraweeControllerBuilder <
       new NullPointerException("No image request was specified!");
 
   // components
-  private final Context mContext;
-  private final Set<ControllerListener> mBoundControllerListeners;
+  private final Context mContext; // 外部引用的上下文，用来创建GestureDetector实例，获取一些view的信息
+  private final Set<ControllerListener> mBoundControllerListeners; // 一个ControllerListener集合,暂时不清楚有啥用.
 
   // builder parameters
-  private @Nullable Object mCallerContext;
-  private @Nullable REQUEST mImageRequest;
-  private @Nullable REQUEST mLowResImageRequest;
-  private @Nullable REQUEST[] mMultiImageRequests;
-  private boolean mTryCacheOnlyFirst;
-  private @Nullable Supplier<DataSource<IMAGE>> mDataSourceSupplier;
-  private @Nullable ControllerListener<? super INFO> mControllerListener;
-  private boolean mTapToRetryEnabled;
-  private boolean mAutoPlayAnimations;
-  private boolean mRetainImageOnFailure;
+  private @Nullable Object mCallerContext; // 调用方传入的上下文引用, 可能会在创建CacheKey的时候有点作用
+  private @Nullable REQUEST mImageRequest; // 主要加载图片的request引用
+  private @Nullable REQUEST mLowResImageRequest; // 用来加载低质量图片的request
+  private @Nullable REQUEST[] mMultiImageRequests; // 多图request
+  private boolean mTryCacheOnlyFirst; // 如果设置为true,则加载图片的时候只从BitmapCache缓存中寻找目标
+  private @Nullable Supplier<DataSource<IMAGE>> mDataSourceSupplier; // 提供图片数据源的supplier类
+  private @Nullable ControllerListener<? super INFO> mControllerListener; // 监听request过程中的一些事件
+  private boolean mTapToRetryEnabled; // 是否允许点击后重新加载图片
+  private boolean mAutoPlayAnimations; // 是否自动播放gif图
+  private boolean mRetainImageOnFailure; // 设置在失败的时候是否显示最后一张可获得的图片
   private String mContentDescription;
   // old controller to reuse
-  private @Nullable DraweeController mOldController;
+  private @Nullable DraweeController mOldController; // 复用之前controller的一些原有逻辑
 
-  private static final AtomicLong sIdCounter = new AtomicLong();
+  private static final AtomicLong sIdCounter = new AtomicLong(); // 一个包含原子操作的增长的long类型
 
   protected AbstractDraweeControllerBuilder(
       Context context,

@@ -35,6 +35,8 @@ import com.facebook.imagepipeline.image.CloseableAnimatedImage;
 
 /**
  * Factory for instances of {@link AnimatedDrawable}.
+ *
+ * 用来产出AnimatedDrawable的工厂类
  */
 public class AnimatedDrawableFactoryImpl implements AnimatedDrawableFactory {
 

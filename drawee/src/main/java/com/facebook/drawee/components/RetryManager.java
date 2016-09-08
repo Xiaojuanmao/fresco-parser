@@ -13,11 +13,12 @@ package com.facebook.drawee.components;
  * Manages retries for an image.
  */
 public class RetryManager {
-  private static final int MAX_TAP_TO_RETRY_ATTEMPTS = 4;
 
-  private boolean mTapToRetryEnabled;
-  private int mMaxTapToRetryAttempts;
-  private int mTapToRetryAttempts;
+  private static final int MAX_TAP_TO_RETRY_ATTEMPTS = 4; // 默认最多重复请求4次
+
+  private boolean mTapToRetryEnabled; // 是否支持点击重试
+  private int mMaxTapToRetryAttempts; // 最大尝试次数
+  private int mTapToRetryAttempts; // 当前尝试次数
 
   public RetryManager() {
     init();

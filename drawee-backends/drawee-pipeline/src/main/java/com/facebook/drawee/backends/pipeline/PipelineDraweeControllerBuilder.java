@@ -38,7 +38,7 @@ public class PipelineDraweeControllerBuilder extends AbstractDraweeControllerBui
     CloseableReference<CloseableImage>,
     ImageInfo> {
 
-  private final ImagePipeline mImagePipeline;
+  private final ImagePipeline mImagePipeline; // 用来控制图片加载流程
   private final PipelineDraweeControllerFactory mPipelineDraweeControllerFactory;
 
   public PipelineDraweeControllerBuilder(

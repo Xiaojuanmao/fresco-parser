@@ -16,6 +16,10 @@ import android.graphics.drawable.Drawable;
  * image until the actual image is set. In case of a failure, hierarchy can choose to display
  * a failure image.
  *
+ * 此接口是hierarchy部分的第二层接口
+ * 第一层接口DraweeHierarchy只关心TopDrawable
+ * 此接口涉及到了drawable layer的模型,定义了一系列方法来顾及在真正图片加载完成之前，对于占位图以及失败之后图片管理
+ *
  * <p>IMPORTANT: methods of this interface are to be used by controllers ONLY!
  *
  * <p>
@@ -43,6 +47,8 @@ import android.graphics.drawable.Drawable;
  *   actual image will be initiated. In case of failure, hierarchy will switch to failure image.
  *   All image branches are wrapped with ScaleType drawable which allows separate scale type to be
  *   applied on each.
+ *
+ *   这层的draweehierarchy用来处理在图片被加载完成之前，对于占位图的显示以及图片加载失败对于失败占位图的处理
  *
  */
 public interface SettableDraweeHierarchy extends DraweeHierarchy {

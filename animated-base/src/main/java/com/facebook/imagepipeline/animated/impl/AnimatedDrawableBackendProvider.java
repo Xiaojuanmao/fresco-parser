@@ -16,6 +16,8 @@ import com.facebook.imagepipeline.animated.base.AnimatedImageResult;
 
 /**
  * Assisted provider for {@link AnimatedDrawableBackend}.
+ *
+ * 一个辅助AnimatedDrawableBackend的类
  */
 public interface AnimatedDrawableBackendProvider {
 

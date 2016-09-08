@@ -21,6 +21,8 @@ import com.facebook.common.references.CloseableReference;
 /**
  * The result of decoding an animated image. Contains the {@link AnimatedImage} as well as
  * additional data.
+ *
+ * 解码之后的带有动画的image,不仅包含了AnimatedImage类，还带有一些其他信息
  */
 public class AnimatedImageResult {
 

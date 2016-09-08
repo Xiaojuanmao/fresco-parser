@@ -43,6 +43,9 @@ import javax.annotation.Nullable;
  *
  * 此类实现了{@link com.facebook.drawee.interfaces.DraweeController}接口
  * 用来将Hierarchy和ImagePipeline之间的联系
+ *
+ * 在使用的时候经常创建的一个类，能够对图片加载过程进行可控
+ * 在Fresco中用到的DraweeController实现类就是这个类
  */
 public class PipelineDraweeController
     extends AbstractDraweeController<CloseableReference<CloseableImage>, ImageInfo> {
@@ -51,14 +54,14 @@ public class PipelineDraweeController
 
   // Components
   private final Resources mResources; // 用来方便取出本地资源
-  private final AnimatedDrawableFactory mAnimatedDrawableFactory;
+  private final AnimatedDrawableFactory mAnimatedDrawableFactory; // 一个通过ClosableImage构造出支持动画的Drawable的工厂类
 
-  private @Nullable MemoryCache<CacheKey, CloseableImage> mMemoryCache;
+  private @Nullable MemoryCache<CacheKey, CloseableImage> mMemoryCache; // 用来进行内存中解码图片信息的缓存
 
-  private CacheKey mCacheKey;
+  private CacheKey mCacheKey; // 当前controller正在处理的图像相关的key
 
   // Constant state (non-final because controllers can be reused)
-  private Supplier<DataSource<CloseableReference<CloseableImage>>> mDataSourceSupplier;
+  private Supplier<DataSource<CloseableReference<CloseableImage>>> mDataSourceSupplier; // 这里的datasource不是final类型，因为controller能够被重用
 
   public PipelineDraweeController(
       Resources resources,
